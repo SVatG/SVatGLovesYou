@@ -42,3 +42,17 @@ const unsigned short rainbowTable[256] =
 	0x205F,0x1C3F,0x183F,0x183F,0x143F,0x101F,0x107F,0x0C7F,
 
 };
+
+#define RGB16(r,g,b) (1 | (b<<10) | (g<<5) | r)
+const unsigned short cutePopTable[12] =
+{
+	RGB16(31,6,6), RGB16(31,11,11), RGB16(31,16,16), RGB16(31,21,21), RGB16(31,26,26), RGB16(31,31,31),
+	RGB16(6,6,31), RGB16(11,11,31), RGB16(16,16,31), RGB16(21,21,31), RGB16(26,26,31), RGB16(31,31,31),
+// 	RGB16(31,31,31),0,0,0,0,0,0,0,0,0,0,0
+};
+
+const unsigned short greyTable[4] =
+{
+// 	RGB16(19,19,19), RGB16(15,15,15), RGB16(31,6,6), RGB16(0,31,6),
+	RGB16(0,0,0), RGB16(19,19,19), RGB16(6,6,6), RGB16(15,15,15),
+};

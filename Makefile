@@ -2,9 +2,15 @@
 NAME = rainbows
 
 # Object files, for the ARM9 binary and the ARM7 binary
-OBJS = Main.o ARM.o Drawing.o nitrofs.o \
-       Loader.o VoxelBlock.o RainbowTable.o \
-       DS3D/DS3D.o DS3D/Utils.o DS3D/Vector/VectorFixed.o \
+OBJS = Main.o ARM.o \
+       Drawing.o \
+       nitrofs.o \
+       Loader.o \
+       VoxelBlock.o \
+       RainbowTable.o \
+       DS3D/DS3D.o \
+       DS3D/Utils.o \
+       DS3D/Vector/VectorFixed.o \
        DS3D/Vector/MatrixFixed.o DS3D/Vector/QuaternionFixed.o \
        effect0.o
 
@@ -20,8 +26,8 @@ LIBS7 = -L$(DEVKITPRO)/libnds/lib -lnds7 -lmm7
 # nitrofs under /gfx.
 # This needs work so that the images are not remade every time the binary is
 # compiled.
-BITMAPS=gfx/aocubes.bin gfx/metaballs.bin gfx/unicorn.bin gfx/clouds.bin \
-	gfx/svatg.bin gfx/bolder1.bin gfx/eis.bin gfx/kirsche.bin gfx/stars.bin
+BITMAPS = gfx/svatgst_indexed.bin \
+          gfx/svatgst_textonly.bin
 
 # Compiler setup
 CC = $(DEVKITARM)/bin/arm-eabi-gcc
