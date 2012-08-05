@@ -64,8 +64,8 @@ const unsigned short flowTable[12] =
 	RGB16(2,2,2)
 };
 
-const unsigned short textTable[4] =
+const unsigned short textTable[5] =
 {
 // 	RGB16(19,19,19), RGB16(15,15,15), RGB16(31,6,6), RGB16(0,31,6),
-	RGB16(0,0,0), RGB16(31,21,21), RGB16(6,6,6), RGB16(31,11,11),
+	RGB16(0,0,0), RGB16(31,21,21), RGB16(6,6,6), RGB16(31,11,11), RGB16(31,31,31),
 };

@@ -87,11 +87,15 @@ int main()
 	mmInitDefault( "nitro:/zik/music.bin" );
 	mmLoad( MOD_RAINBOWS_CLN );
 	mmStart( MOD_RAINBOWS_CLN, MM_PLAY_ONCE );
+	effect0_change(0);
 
 	while( t<140*60 ) {
 
 		#ifdef EFFECT_DEBUG
 		effect0_update(t);
+		if( t == 16*20+30 ) {
+			effect0_change(1);
+		}
 		#else
 		
 		if( t < 16*60+30 ) {

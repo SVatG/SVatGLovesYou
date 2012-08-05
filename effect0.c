@@ -6,8 +6,27 @@
 
 #include "RainbowTable.h"
 
+const char* spriteNames[3] = {
+	"nitro:/gfx/haato_metaballs.img.bin",
+	"nitro:/gfx/haato_thatone.img.bin",
+	"nitro:/gfx/haato_raymarching.img.bin",
+};
+
+uint8_t* effect0_loadimage;
+int32_t switchin_status = 128;
+
+void effect0_change(int toIndex) {
+	int fd = open( spriteNames[toIndex], O_RDONLY );
+	read( fd, effect0_loadimage, 128*128 );
+	close( fd );
+	switchin_status = 0;
+}
+
 void effect0_init() {
 
+	// Temp image for loadin
+	effect0_loadimage = (uint8_t*)malloc(128*128);
+	
 	// VRAM and DISP setup.
 	VRAMCNT_C = VRAMCNT_C_BG_VRAM_B;
 	DISPCNT_B = DISPCNT_MODE_5 | DISPCNT_BG2_ON | DISPCNT_BG3_ON | DISPCNT_ON;
@@ -39,7 +58,7 @@ void effect0_init() {
 }
 
 void updatecol(int t) {
-	dmaCopyHalfWords( 0, textTable, PALRAM_B + 51 , 10 );
+	dmaCopyHalfWords( 0, textTable, PALRAM_B + 51 , 12 );
 	for(int i = 0; i < 51; i++) {
 		dmaCopyHalfWords( 0, flowTable + ((t/4+255-i)%11), PALRAM_B + i%255 , 2 );
 	}
@@ -47,17 +66,41 @@ void updatecol(int t) {
 
 u8 effect0_update( u32 t ) {
 	int dx = (abs(isin( (512-128-64) + (t*24000)/512)))>>8;
-	int dy = isin(isin(t*4))>>7;
 	BG2PA_B = (1 << 8) - dx;
 	BG2PB_B = 0;
 	BG2PC_B = 0;
 	BG2PD_B = (1 << 8) - dx;
 	BG2X_B = (1<<10);
 	BG2Y_B = (1<<10);
-// 
-// 	BG3X_A = 100;
 	
 	updatecol(t);
+
+	if(switchin_status < 128) {
+		for(int y = 0; y < 128; y++) {
+			if(effect0_loadimage[128*y+switchin_status] != 51) {
+				uint16_t* vrampointer = (uint16_t*)(((uint8_t*)(VRAM_B+256*64*2))+256*(60+y)+124+switchin_status);
+				uint16_t old = vrampointer[0];
+				uint16_t new = effect0_loadimage[128*y+switchin_status];
+				old =
+					(old & (switchin_status%2==1?0x00FF:0xFF00)) |
+					(new<<(switchin_status%2==1?8:0));
+				vrampointer[0] = old;
+			}
+		}
+		switchin_status++;
+		for(int y = 0; y < 128; y++) {
+			if(effect0_loadimage[128*y+switchin_status] != 51) {
+				uint16_t* vrampointer = (uint16_t*)(((uint8_t*)(VRAM_B+256*64*2))+256*(60+y)+124+switchin_status);
+				uint16_t old = vrampointer[0];
+				uint16_t new = effect0_loadimage[128*y+switchin_status];
+				old =
+					(old & (switchin_status%2==1?0x00FF:0xFF00)) |
+					(new<<(switchin_status%2==1?8:0));
+				vrampointer[0] = old;
+			}
+		}
+		switchin_status++;
+	}
 	
 	return( 0 );
 }
