@@ -39,9 +39,9 @@ void effect0_init() {
 }
 
 void updatecol(int t) {
-	dmaCopyHalfWords( 0, greyTable, PALRAM_B + 51 , 10 );
+	dmaCopyHalfWords( 0, textTable, PALRAM_B + 51 , 10 );
 	for(int i = 0; i < 51; i++) {
-		dmaCopyHalfWords( 0, cutePopTable + ((t/4+255-i)%11), PALRAM_B + i%255 , 2 );
+		dmaCopyHalfWords( 0, flowTable + ((t/4+255-i)%11), PALRAM_B + i%255 , 2 );
 	}
 }
 
