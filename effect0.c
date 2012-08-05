@@ -46,14 +46,14 @@ void updatecol(int t) {
 }
 
 u8 effect0_update( u32 t ) {
-	int dx = isin(t*4*6)>>2;
-	int dy = isin(isin(t*4))>>2;
-	BG2PA_B = (1 << 8);
+	int dx = (abs(isin( (512-128-64) + (t*24000)/512)))>>8;
+	int dy = isin(isin(t*4))>>7;
+	BG2PA_B = (1 << 8) - dx;
 	BG2PB_B = 0;
 	BG2PC_B = 0;
-	BG2PD_B = (1 << 8);
-	BG2X_B = dx;
-	BG2Y_B = 0;
+	BG2PD_B = (1 << 8) - dx;
+	BG2X_B = (1<<10);
+	BG2Y_B = (1<<10);
 // 
 // 	BG3X_A = 100;
 	

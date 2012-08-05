@@ -55,7 +55,13 @@ const unsigned short flowTable[12] =
 
 	// Grey shade trail
 	RGB16(31,31,31), RGB16(28,28,28), RGB16(23,23,23), RGB16(16,16,16), RGB16(7,7,7),
-	0,0,0,0,0,0,0
+	RGB16(2,2,2),
+	RGB16(2,2,2),
+	RGB16(2,2,2),
+	RGB16(2,2,2),
+	RGB16(2,2,2),
+	RGB16(2,2,2),
+	RGB16(2,2,2)
 };
 
 const unsigned short textTable[4] =
