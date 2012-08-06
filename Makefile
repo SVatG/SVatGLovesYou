@@ -1,5 +1,5 @@
 # Binary name.
-NAME = rainbows
+NAME = svatglovesyou
 
 # Object files, for the ARM9 binary and the ARM7 binary
 OBJS = Main.o ARM.o \
@@ -12,7 +12,8 @@ OBJS = Main.o ARM.o \
        DS3D/Utils.o \
        DS3D/Vector/VectorFixed.o \
        DS3D/Vector/MatrixFixed.o DS3D/Vector/QuaternionFixed.o \
-       effect0.o
+       effect0.o \
+       metaballs.o \
 
 OBJS7 = Main.arm7.o
 
@@ -30,7 +31,8 @@ BITMAPS = gfx/svatgst_indexed.bin \
           gfx/svatgst_textonly.bin \
           gfx/haato_metaballs.bin \
 	  gfx/haato_raymarching.bin \
-	  gfx/haato_thatone.bin
+	  gfx/haato_thatone.bin \
+	  gfx/ball_bg_stripes.bin
 	  
 # Compiler setup
 CC = $(DEVKITARM)/bin/arm-eabi-gcc

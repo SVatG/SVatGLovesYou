@@ -50,9 +50,9 @@ void effect0_init() {
 	BG3PD_B = (1 << 8);
 	BG3X_B = 0;
 	BG3Y_B = 0;
-	
-	load8bVRAMIndirect("nitro:/gfx/svatgst_textonly.img.bin", VRAM_B,256*256);
-	load8bVRAMIndirect("nitro:/gfx/svatgst_indexed.img.bin", VRAM_B+256*64*2,256*256);
+
+	load8bVRAMIndirect("nitro:/gfx/svatgst_indexed.img.bin", VRAM_B+64*512,256*128);
+	load8bVRAMIndirect("nitro:/gfx/svatgst_textonly.img.bin", VRAM_B,256*150);
 	load8bVRAMIndirect("nitro:/gfx/svatgst_indexed.pal.bin", PALRAM_B,256);
 
 }

@@ -53,6 +53,10 @@ void fadein(int t, int b) {
 }
 
 
+// EFFECTS:
+// 0: Subscreen whopper. PERMAUSES VRAM C don't use that.
+// 1: 
+
 int main()
 {
 	// Turn on everything.
@@ -77,6 +81,8 @@ int main()
 	#define EFFECT_DEBUG
 	#ifdef EFFECT_DEBUG
 	effect0_init();
+	metaballs_init();
+	metaballs_precompute();
 	#else
 	effect0_init();
 	#endif
@@ -93,6 +99,7 @@ int main()
 
 		#ifdef EFFECT_DEBUG
 		effect0_update(t);
+		metaballs_update(t);
 		if( t == 16*20+30 ) {
 			effect0_change(1);
 		}
