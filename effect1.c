@@ -4,7 +4,9 @@
 #include "RainbowTable.h"
 #include "Loader.h"
 
-u16* dot_sprite[9];
+u16* dot_sprite[8];
+u16* front_sprite[12];
+
 void effect1_init() {
 	DISPCNT_A = DISPCNT_MODE_5 | DISPCNT_BG2_ON | DISPCNT_BG3_ON | DISPCNT_OBJ_ON | DISPCNT_ON;
 	VRAMCNT_D = VRAMCNT_D_BG_VRAM_A_OFFS_128K;
@@ -31,6 +33,7 @@ void effect1_init() {
 	BG2Y_A = 40000;
 
 	VRAMCNT_A = VRAMCNT_A_OBJ_VRAM_A;
+
 	oamInit(&oamMain, SpriteMapping_Bmp_1D_128, false);
 	
 	loadVRAMIndirect("nitro:/gfx/ecgdot_0.pal.bin", SPRITE_PALETTE, 512);
@@ -43,10 +46,22 @@ void effect1_init() {
 	dot_sprite[5] = loadBmpSpriteA( "nitro:/gfx/ecgdot_5.img.bin" );
 	dot_sprite[6] = loadBmpSpriteA( "nitro:/gfx/ecgdot_6.img.bin" );
 	dot_sprite[7] = loadBmpSpriteA( "nitro:/gfx/ecgdot_7.img.bin" );
-	dot_sprite[8] = loadBmpSpriteA( "nitro:/gfx/ecgdot_8.img.bin" );
+
+	front_sprite[0] = loadBmpSpriteAGreen( "nitro:/gfx/ecgfront_tiles_00.img.bin" );
+	front_sprite[1] = loadBmpSpriteAGreen( "nitro:/gfx/ecgfront_tiles_01.img.bin" );
+	front_sprite[2] = loadBmpSpriteAGreen( "nitro:/gfx/ecgfront_tiles_02.img.bin" );
+	front_sprite[3] = loadBmpSpriteAGreen( "nitro:/gfx/ecgfront_tiles_03.img.bin" );
+	front_sprite[4] = loadBmpSpriteAGreen( "nitro:/gfx/ecgfront_tiles_04.img.bin" );
+	front_sprite[5] = loadBmpSpriteAGreen( "nitro:/gfx/ecgfront_tiles_05.img.bin" );
+	front_sprite[6] = loadBmpSpriteAGreen( "nitro:/gfx/ecgfront_tiles_06.img.bin" );
+	front_sprite[7] = loadBmpSpriteAGreen( "nitro:/gfx/ecgfront_tiles_07.img.bin" );
+	front_sprite[8] = loadBmpSpriteAGreen( "nitro:/gfx/ecgfront_tiles_08.img.bin" );
+	front_sprite[9] = loadBmpSpriteAGreen( "nitro:/gfx/ecgfront_tiles_09.img.bin" );
+	front_sprite[10] = loadBmpSpriteAGreen( "nitro:/gfx/ecgfront_tiles_10.img.bin" );
+	front_sprite[11] = loadBmpSpriteAGreen( "nitro:/gfx/ecgfront_tiles_11.img.bin" );
 	
 	vu16* mem_BLDCNT_A = (vu16*)(0x04000050);
-	*mem_BLDCNT_A = BIT(4) | BIT(6) | BIT(0) | BIT(8) | BIT(9) | BIT(10) | BIT(11) | BIT(12) | BIT(13) | BIT(2);
+	*mem_BLDCNT_A = /*BIT(4) |*/ BIT(6) | BIT(0) | BIT(8) | BIT(9) | BIT(10) | BIT(11) | BIT(12) | BIT(13) | BIT(2);
 	BLDALPHA_A = BLDALPHA_EVA(15)|BLDALPHA_EVB(15);
 }
 
@@ -134,17 +149,29 @@ void drawbars(int t) {
 
 u8 effect1_update( u32 t ) {
 	BG3X_A = t*800;
-	BG3Y_A = -t*600;
+	BG3Y_A = -t*512;
 	
 	drawbars(t);
 	drawbars(t);
 
+	for(int i = 0; i < 12; i++ ) {
+		oamSet(
+			&oamMain, i,
+			64*(i%4),64*(i/4),
+			0, 15,
+			SpriteSize_64x64,
+			SpriteColorFormat_Bmp,
+			front_sprite[i],
+			32, false, false, false, false, false
+		);
+	}
+	
 	float dx = (200.0-175.0) / (175.0-50.0);
 	float dy = (165.0-40.0) / (175.0-50.0);
 	for(int i = 0; i < 8; i++) {
 		for(int dot = 0; dot < 5; dot++) {
 			oamSet(
-				&oamMain, i*8+dot,
+				&oamMain, 12+i*8+dot,
 				168+dx*(line_start[dot]-50)-16,40+dy*(line_start[dot]-50)-16,
 				0, 15-2*i,
 				SpriteSize_32x32,
@@ -164,4 +191,6 @@ u8 effect1_update( u32 t ) {
 
 void effect1_destroy() {
 	irqDisable( IRQ_HBLANK );
+	BLDCNT_A = 0;
+	BLDALPHA_A = 0;
 }

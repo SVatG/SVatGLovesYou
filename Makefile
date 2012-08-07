@@ -15,7 +15,8 @@ OBJS = Main.o ARM.o \
        effect0.o \
        metaballs.o \
        effect1.o \
- 
+       effect2.o
+
 OBJS7 = Main.arm7.o
 
 #DEVKITPRO=../devkit/devkitPro
@@ -43,7 +44,37 @@ BITMAPS = gfx/svatgst_indexed.bin \
 	  gfx/ecgdot_6.bin \
 	  gfx/ecgdot_7.bin \
 	  gfx/ecgdot_8.bin \
-	  gfx/ecgback.bin
+	  gfx/ecgback.bin \
+	  gfx/ecgfront_tiles_00.bin \
+	  gfx/ecgfront_tiles_01.bin \
+	  gfx/ecgfront_tiles_02.bin \
+	  gfx/ecgfront_tiles_03.bin \
+	  gfx/ecgfront_tiles_04.bin \
+	  gfx/ecgfront_tiles_05.bin \
+	  gfx/ecgfront_tiles_06.bin \
+	  gfx/ecgfront_tiles_07.bin \
+	  gfx/ecgfront_tiles_08.bin \
+	  gfx/ecgfront_tiles_09.bin \
+	  gfx/ecgfront_tiles_10.bin \
+	  gfx/ecgfront_tiles_11.bin \
+	  gfx/greethaato_blank.bin \
+	  gfx/stripe_bg.bin \
+	  gfx/greethaato_mercury.bin \
+	  gfx/greethaato_k2.bin \
+	  gfx/greethaato_nuance.bin \
+	  gfx/greethaato_rno.bin \
+	  gfx/greets_border_00.bin \
+	  gfx/greets_border_01.bin \
+	  gfx/greets_border_02.bin \
+	  gfx/greets_border_03.bin \
+	  gfx/greets_border_04.bin \
+	  gfx/greets_border_05.bin \
+	  gfx/greets_border_06.bin \
+	  gfx/greets_border_07.bin \
+	  gfx/greets_border_08.bin \
+	  gfx/greets_border_09.bin \
+	  gfx/greets_border_10.bin \
+	  gfx/greets_border_11.bin 
 	  
 # Compiler setup
 CC = $(DEVKITARM)/bin/arm-eabi-gcc

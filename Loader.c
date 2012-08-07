@@ -41,6 +41,19 @@ void loadImageVRAMIndirect(char* path, uint16_t* vramPos, uint32_t size) {
 	}
 }
 
+// Fuck everything these functions are now anything but general
+void loadImageVRAMIndirectGreen(char* path, uint16_t* vramPos, uint32_t size) {
+	int fd = open( path, O_RDONLY );
+	read( fd, tempImage, size*2 );
+	close( fd );
+
+ 	for( int i = 0; i < size; i++ ) {
+		vramPos[i] = tempImage[i] | ((tempImage[i]|BIT(15)) == ((31<<5)|BIT(15)) ?0:BIT(15));
+	}
+}
+
+
+
 // Load a single 8bit image into VRAM at a specified position by first loading
 // it into main memory and them DMA'ing it to VRAM.
 void load8bVRAMIndirect(char* path, uint16_t* vramPos, uint32_t size) {
@@ -70,6 +83,11 @@ uint16_t* loadSpriteA( char* path ) {
 uint16_t* loadBmpSpriteA( char* path ) {
 	uint16_t* newSprite = oamAllocateGfx(&oamMain, SpriteSize_32x32, SpriteColorFormat_Bmp);
 	loadImageVRAMIndirect( path, newSprite, 64*64 );
+	return( newSprite );
+}
+uint16_t* loadBmpSpriteAGreen( char* path ) {
+	uint16_t* newSprite = oamAllocateGfx(&oamMain, SpriteSize_64x64, SpriteColorFormat_Bmp);
+	loadImageVRAMIndirectGreen( path, newSprite, 64*64*2 );
 	return( newSprite );
 }
 uint16_t* loadSpriteB( char* path ) {
