@@ -20,9 +20,9 @@ void ClaimWRAM()
 static inline int32_t approxabs(int32_t x) { return x^(x>>31); }
 
 // Uncomment to force inlining.
-//static inline int RenderPixel(int32_t x,int32_t y,int32_t z,int32_t dx,int32_t dy,int32_t dz) __attribute__((always_inline));
-
-static inline int RenderPixel(int32_t x,int32_t y,int32_t z,int32_t dx,int32_t dy,int32_t dz)
+//static inline int ATTR_ITCM __attribute__((always_inline)) RenderPixel(int32_t x,int32_t y,int32_t z,int32_t dx,int32_t dy,int32_t dz);
+static inline int ATTR_ITCM RenderPixel(int32_t x,int32_t y,int32_t z,int32_t dx,int32_t dy,int32_t dz);
+static inline int ATTR_ITCM RenderPixel(int32_t x,int32_t y,int32_t z,int32_t dx,int32_t dy,int32_t dz)
 {
 	int i=23;
 
