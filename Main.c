@@ -64,7 +64,7 @@ int main()
 	irqEnable( IRQ_VBLANK );
 	irqSet(IRQ_VBLANK,vblank);
 
-// 	ClaimWRAM();
+	ClaimWRAM();
 
 	// Init NitroFS for data loading.
 	nitroFSInitAdv( BINARY_NAME );
@@ -96,6 +96,7 @@ int main()
 	mmStart( MOD_RAINBOWS_CLN, MM_PLAY_ONCE );
 	effect0_change(0);
 
+	int next_effect_init = 0;
 	while( t<140*60 ) {
 
 		#ifdef EFFECT_DEBUG
@@ -109,25 +110,21 @@ int main()
 
 		effect0_update(t);
 		if( t < 10*60 ) {
-			effect1_update();
+			effect1_update(t);
 		}
-		else if(t < 27*60) {
-// 			effect6_update(t);
-// 			fadein(t,16*60+30);
-// 			fadeout(t,27*60);
-// 			if( t >= 27*60-3 ) {
-// 				effect6_destroy();
-// 				effect2_init();
-// 			}
+		else if(t < 20*60) {
+			if(next_effect_init < 1) {
+				next_effect_init++;
+				effect1_destroy();
+				metaballs_init();
+			}
+			metaballs_update(t);
 		}
-		else if( t < 37*60 ) {
-// 			effect2_update(t);
-// 			fadein(t,27*60);
-// 			fadeout(t,37*60);
-// 			if( t >= 37*60-3 ) {
-// 				effect2_destroy();
-// 				effect1_init();
-// 			}
+		else if( t < 30*60 ) {
+			if(next_effect_init < 1) {
+				next_effect_init++;
+				metaballs_init();
+			}
 		}
 		else if( t < 129*60 ) {
 // 			Truchet(t);

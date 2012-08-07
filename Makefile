@@ -23,7 +23,7 @@ OBJS7 = Main.arm7.o
 
 # Libraries to link into the respective binaries
 LIBS = -L$(DEVKITPRO)/libnds/lib -lfat -lnds9 -lm -lmm9
-LIBS7 = -L$(DEVKITPRO)/libnds/lib -lnds7 -lmm7
+LIBS7 = -L$(DEVKITPRO)/libnds/lib -lnds7 -lmm7 -ldswifi7
 
 # Bitmaps, to be converted to .bin files by grit and then stored in the
 # nitrofs under /gfx.
@@ -87,7 +87,7 @@ CFLAGS = -std=gnu99 -O3 -mcpu=arm9e -mtune=arm9e -ffast-math \
 CFLAGSARM = -std=gnu99 -Os -mcpu=arm9e -mtune=arm9e -ffast-math \
 -marm -mthumb-interwork -I$(DEVKITPRO)/libnds/include -DARM9 $(DEFINES) \
 -D__NITRO__ -DBINARY_NAME=\"$(NAME).nds\" -DDEBUG
-CFLAGS7 = -std=gnu99 -O3 -ffast-math -fomit-frame-pointer -mcpu=arm7tdmi \
+CFLAGS7 = -std=gnu99 -Os -ffast-math -fomit-frame-pointer -mcpu=arm7tdmi \
 -mtune=arm7tdmi -mthumb -mthumb-interwork -I$(DEVKITPRO)/libnds/include -DARM7 $(DEFINES)
 LDFLAGS = -specs=ds_arm9.specs -mthumb -mthumb-interwork -mno-fpu
 LDFLAGS7 = -specs=./ds_arm7_.specs -mthumb -mthumb-interwork -mno-fpu
@@ -105,7 +105,7 @@ $(NAME).nds: $(NAME).arm9 $(NAME).arm7
 	$(DEVKITARM)/bin/grit gfx_source/pal_images/pal_reduced.png -gB8 -gb -ftb -ogfx/palette.png
 	rm gfx/palette.img.bin
 	cp gfx/*.bin Datafiles/gfx
-	$(DEVKITARM)/bin/ndstool -c $@ -9 $(NAME).arm9 -7 default.arm7 -d Datafiles
+	$(DEVKITARM)/bin/ndstool -c $@ -9 $(NAME).arm9 -7 $(NAME).arm7 -r7 0x3800000 -e7 0x3800000 -d Datafiles
 
 # Arm9 / Arm7 binary rules
 $(NAME).arm9: $(NAME).arm9.elf

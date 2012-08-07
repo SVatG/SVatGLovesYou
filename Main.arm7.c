@@ -27,19 +27,14 @@
 		distribution.
 
 ---------------------------------------------------------------------------------*/
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #include <nds.h>
-// #include <dswifi7.h>
-#include <nds/fifocommon.h>
-#include <nds/fifomessages.h>
+#include <dswifi7.h>
+#include <maxmod7.h>
 
 //---------------------------------------------------------------------------------
 void VblankHandler(void) {
 //---------------------------------------------------------------------------------
-// 	Wifi_Update();
+	Wifi_Update();
 }
 
 
@@ -57,8 +52,9 @@ void powerButtonHandler() {
 	exitflag = true;
 }
 
-u8* soundBuffer[6400];
+//---------------------------------------------------------------------------------
 int main() {
+//---------------------------------------------------------------------------------
 	readUserSettings();
 
 	irqInit();
@@ -67,10 +63,13 @@ int main() {
 
 	fifoInit();
 
+	mmInstall(FIFO_MAXMOD);
+
 	SetYtrigger(80);
 
-// 	installWifiFIFO();
- 	installSoundFIFO();	
+	installWifiFIFO();
+	installSoundFIFO();
+
 	installSystemFIFO();
 
 	irqSet(IRQ_VCOUNT, VcountHandler);
@@ -80,6 +79,7 @@ int main() {
 
 	irqEnable( IRQ_VBLANK | IRQ_VCOUNT | IRQ_NETWORK);
 
+	// Keep the ARM7 mostly idle
 	while (!exitflag) {
 		if ( 0 == (REG_KEYINPUT & (KEY_SELECT | KEY_START | KEY_L | KEY_R))) {
 			exitflag = true;
@@ -88,7 +88,3 @@ int main() {
 	}
 	return 0;
 }
-
-#ifdef __cplusplus
-}
-#endif
