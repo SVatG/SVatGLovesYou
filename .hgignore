@@ -1,0 +1,4 @@
+glob:*.o
+glob:gfx/*.h
+glob:*.bin
+glob:svatglovesyou.*

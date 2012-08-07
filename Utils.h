@@ -63,6 +63,7 @@ static inline int FixedToInt(int32_t val) { return val>>12; }
 static inline int FixedToRoundedInt(int32_t val) { return (val+0x800)>>12; }
 
 #define F(x) ((int32_t)((x)*4096))
+#define Fix(x) (F(x))
 
 //static inline int32_t FixedMul(int32_t a,int32_t b) { return ((int64_t)a*(int64_t)b)>>16; }
 
@@ -150,6 +151,27 @@ static inline void inormalize(int32_t *v)
 	v[0]=idiv(v[0],mag);
 	v[1]=idiv(v[1],mag);
 	v[2]=idiv(v[2],mag);
+}
+
+static inline int32_t isq(int32_t val) { return imul(val,val); }
+
+static uint32_t sqrti(uint32_t n)
+{
+	uint32_t s,t;
+
+	#define sqrtBit(k) \
+	t = s+(1UL<<(k-1)); t <<= k+1; if (n >= t) { n -= t; s |= 1UL<<k; }
+
+	s=0;
+	if(n>=1<<30) { n-=1<<30; s=1<<15; }
+	sqrtBit(14); sqrtBit(13); sqrtBit(12); sqrtBit(11); sqrtBit(10);
+	sqrtBit(9); sqrtBit(8); sqrtBit(7); sqrtBit(6); sqrtBit(5);
+	sqrtBit(4); sqrtBit(3); sqrtBit(2); sqrtBit(1);
+	if(n>s<<1) s|=1;
+
+	#undef sqrtBit
+
+	return s;
 }
 
 
