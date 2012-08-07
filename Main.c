@@ -82,13 +82,13 @@ int main()
 	#define EFFECT_DEBUG
 	#ifdef EFFECT_DEBUG
 	effect0_init();
-	effect3_init();
+// 	effect3_init();
+	InitField();	
 	metaballs_precompute();
 	#else
 	metaballs_precompute();	
 	effect0_init();
-//	effect1_init();
-InitField();
+	effect1_init();
 	#endif
 	
 	uint8_t *wram=(uint8_t *)0x3000000;
@@ -104,7 +104,8 @@ InitField();
 
 		#ifdef EFFECT_DEBUG
 		effect0_update(t);
-		effect3_update(t);
+// 		effect3_update(t);
+		RunField(t);
 // 		metaballs_update(t);
 		if( t == 16*20+30 ) {
 			effect0_change(1);
@@ -113,8 +114,7 @@ InitField();
 
 		effect0_update(t);
 		if( t < 1000*60 ) {
-RunField(t);
-//			effect1_update(t);
+			effect1_update(t);
 		}
 		else if(t < 20*60) {
 			if(next_effect_init < 1) {
