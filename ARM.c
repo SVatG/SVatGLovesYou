@@ -44,7 +44,8 @@ static inline int RenderPixel(int32_t x,int32_t y,int32_t z,int32_t dx,int32_t d
 		int32_t ty=approxabs(y)>>16;
 		int32_t tz=approxabs(z)>>16;
 
-		int32_t dist=tx+ty+tz-0x8000;
+// 		int32_t dist=tx+ty+tz-0x8000;
+		int32_t dist=(tx+ty+(tz&0xf0f0))-0x8000;
 
 		if((uint32_t)dist<=0x400) break;
 
