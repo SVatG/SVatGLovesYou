@@ -8,6 +8,7 @@ OBJS = Main.o ARM.o \
        Loader.o \
        VoxelBlock.o \
        RainbowTable.o \
+       Field.o \
        DS3D/DS3D.o \
        DS3D/Utils.o \
        DS3D/Vector/VectorFixed.o \

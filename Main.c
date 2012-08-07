@@ -17,6 +17,7 @@
 
 // Effects!
 #include "effects.h"
+#include "Field.h"
 #include "ARM.h"
 
 // Sound!
@@ -86,7 +87,8 @@ int main()
 	#else
 	metaballs_precompute();	
 	effect0_init();
-	effect1_init();
+//	effect1_init();
+InitField();
 	#endif
 	
 	uint8_t *wram=(uint8_t *)0x3000000;
@@ -110,8 +112,9 @@ int main()
 		#else
 
 		effect0_update(t);
-		if( t < 10*60 ) {
-			effect1_update(t);
+		if( t < 1000*60 ) {
+RunField(t);
+//			effect1_update(t);
 		}
 		else if(t < 20*60) {
 			if(next_effect_init < 1) {
