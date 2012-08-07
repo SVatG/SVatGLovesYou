@@ -4,174 +4,159 @@
 #include "RainbowTable.h"
 #include "Loader.h"
 
-u16* arr_a;
-u16* arr_b;
-u16* arr_c;
+u16* dot_sprite[9];
 void effect1_init() {
-		
 	DISPCNT_A = DISPCNT_MODE_5 | DISPCNT_BG2_ON | DISPCNT_BG3_ON | DISPCNT_OBJ_ON | DISPCNT_ON;
 	VRAMCNT_D = VRAMCNT_D_BG_VRAM_A_OFFS_128K;
 	VRAMCNT_B = VRAMCNT_B_BG_VRAM_A_OFFS_0K;
 	
 	BG3CNT_A = BGxCNT_EXTENDED_BITMAP_16 | BGxCNT_BITMAP_SIZE_256x256 | BGxCNT_OVERFLOW_WRAP | BGxCNT_BITMAP_BASE_0K;
-	BG3CNT_A = (BG3CNT_A&~BGxCNT_PRIORITY_MASK)|BGxCNT_PRIORITY_1;
+	BG3CNT_A = (BG3CNT_A&~BGxCNT_PRIORITY_MASK)|BGxCNT_PRIORITY_2;
 	BG3PA_A = (1 << 8);
 	BG3PB_A = 0;
 	BG3PC_A = 0;
 	BG3PD_A = (1 << 8);
 	BG3X_A = 0;
 	BG3Y_A = 0;
+
+	loadImage( "nitro:/gfx/ecgback.img.bin", VRAM_A_OFFS_0K,256*256*2);
 	
 	BG2CNT_A = BGxCNT_EXTENDED_BITMAP_16 | BGxCNT_BITMAP_SIZE_256x256 | BGxCNT_OVERFLOW_TRANSPARENT | BGxCNT_BITMAP_BASE_128K;
 	BG2CNT_A = (BG2CNT_A&~BGxCNT_PRIORITY_MASK)|BGxCNT_PRIORITY_1;
-	BG2PA_A = icos(-800)>>4;
-	BG2PB_A = isin(-800)>>4;
-	BG2PC_A = -isin(-800)>>4;
-	BG2PD_A = icos(-800)>>4;
-	BG2X_A = 50000;
-	BG2Y_A = -30000;
-
-	loadImage( "nitro:/gfx/clouds.img.bin", VRAM_A_OFFS_0K,256*192*2);
-	loadVRAMIndirect( "nitro:/gfx/clouds.img.bin", VRAM_A_OFFS_128K,256*192*2);
+	BG2PA_A = icos(900)>>4;
+	BG2PB_A = isin(900)>>4;
+	BG2PC_A = -isin(900)>>4;
+	BG2PD_A = icos(900)>>4;
+	BG2X_A = -5000;
+	BG2Y_A = 40000;
 
 	VRAMCNT_A = VRAMCNT_A_OBJ_VRAM_A;
+	oamInit(&oamMain, SpriteMapping_Bmp_1D_128, false);
+	
+	loadVRAMIndirect("nitro:/gfx/ecgdot_0.pal.bin", SPRITE_PALETTE, 512);
 
-	oamInit(&oamMain, SpriteMapping_1D_128, false);
-	loadVRAMIndirect("nitro:/gfx/unicorn.pal.bin", SPRITE_PALETTE, 512);
-	arr_a = loadSpriteA( "nitro:/gfx/unicorn.img.bin" );
-	arr_b = arr_a;
-	arr_c = arr_a;
+	dot_sprite[0] = loadBmpSpriteA( "nitro:/gfx/ecgdot_0.img.bin" );
+	dot_sprite[1] = loadBmpSpriteA( "nitro:/gfx/ecgdot_1.img.bin" );
+	dot_sprite[2] = loadBmpSpriteA( "nitro:/gfx/ecgdot_2.img.bin" );
+	dot_sprite[3] = loadBmpSpriteA( "nitro:/gfx/ecgdot_3.img.bin" );
+	dot_sprite[4] = loadBmpSpriteA( "nitro:/gfx/ecgdot_4.img.bin" );
+	dot_sprite[5] = loadBmpSpriteA( "nitro:/gfx/ecgdot_5.img.bin" );
+	dot_sprite[6] = loadBmpSpriteA( "nitro:/gfx/ecgdot_6.img.bin" );
+	dot_sprite[7] = loadBmpSpriteA( "nitro:/gfx/ecgdot_7.img.bin" );
+	dot_sprite[8] = loadBmpSpriteA( "nitro:/gfx/ecgdot_8.img.bin" );
+	
+	vu16* mem_BLDCNT_A = (vu16*)(0x04000050);
+	*mem_BLDCNT_A = BIT(4) | BIT(6) | BIT(0) | BIT(8) | BIT(9) | BIT(10) | BIT(11) | BIT(12) | BIT(13) | BIT(2);
+	BLDALPHA_A = BLDALPHA_EVA(15)|BLDALPHA_EVB(15);
 }
 
-int arra_m = 2;
-int arrb_m = -2;
-int arrc_m = 2;
-int arra_s = 0;
-int arrb_s = 160;
-int arrc_s = 100;
+int heartbeat(int tmod, int arra_s, int* arra_r, int station) {
+	if(tmod < 7) {
+		arra_s -= 1;
+		*arra_r = 6;
+	}
+	else if(tmod < 14) {
+		arra_s += 1;
+		*arra_r = 6;
+	}
+	else if(tmod < 20) {
+		// Nada
+		*arra_r = 5;
+	}
+	else if(tmod < 25) {
+		arra_s += 1;
+		*arra_r = 6;
+	}
+	else if(tmod < 32) {
+		arra_s -= 5;
+		*arra_r = 15;
+	}
+	else if(tmod < 40) {
+		arra_s += 5;
+		*arra_r = 15;
+	} else if(tmod < 43) {
+		arra_s -= 4;
+		*arra_r = 12;
+	} else if(tmod < 51) {
+		// Nada
+		*arra_r = 5;
+	} else if(tmod < 59) {
+		arra_s -= 1;
+		*arra_r = 6;
+	}
+	else if(tmod < 68) {
+		arra_s += 1;
+		*arra_r = 6;
+	} else {
+		arra_s = station;
+		*arra_r = 5;
+	}
+	return arra_s;
+}
 
+int line_start[5];
 void drawbars(int t) {
 	u16* bg = (u16*)(VRAM_A_OFFS_0K+0x10000);
-
-	arra_s += arra_m;
-// 	arrb_s += arrb_m;
-// 	arrc_s += arrc_m;
-
-	int bnd = 128;
 	
-	if( arra_m == 2 ) {
-		if( arra_s > 158 + Random()%98 ) {
-			arra_m = -1;
-		}
-	}
-	else {
-		if( arra_s < 98 - Random()%98 ) {
-			arra_m = 2;
-		}
-	}
-
-	arrb_s = (isin(t<<4)>>5)+100;
-
 	int arra_r = 0;
 	int arrb_r = 0;
 	int arrc_r = 0;
-	for( int x = 0; x < 256; x++ ) {
-		if( x > arra_s && x < arra_s + 30 ) {
-			bg[x] = rainbowTable[(t+arra_r)%255] | BIT(15);
-			arra_r += 10;
+
+	int line_size[5];
+
+	for(int i = 0; i < 5; i++) {
+		line_start[i] = heartbeat((t+((i*348923)%17777))%(80+((i*2981)%60)), line_start[i], &line_size[i], 50+i*35);
+	}
+
+	for(int x = 0; x < 256; x++) {
+		uint16_t brightness = 0;
+		for(int i = 0; i < 5; i++) {
+			if( x >= line_start[i] && x <= line_start[i] + line_size[i]*2 ) {
+				int brightness_local = line_size[i] - abs(x - (line_start[i] + line_size[i]));
+				brightness+=brightness_local;
+			}
 		}
-		else if( x > arrb_s && x < arrb_s + 20 ) {
-			bg[x] = rainbowTable[(t+50+arrb_r)%255] | BIT(15);
-			arrb_r += 10;
+		if(brightness != 0) {
+			int rb = (brightness * 7)/9 > 31 ? 31 : (brightness*7)/9;
+			int g = (brightness * 12)/9 > 31 ? 31 : (brightness*12)/9;
+			bg[x] = MakeRGB15(rb,g,rb);
 		}
-		else if( x > arrc_s - (isin(t<<4)>>7) && x < arrc_s + 20 - (isin(t<<4)>>7) ) {
-			bg[x] = rainbowTable[(t+100+arrc_r)%255] | BIT(15);
-			arrc_r += 10;
-		} else {
+		else {
 			bg[x] = ~BIT(15);
 		}
+
 	}
 
 	for( int y = 192; y > 0; y-- ) {
 		dmaCopy( &bg[(y-1)*256], &bg[y*256], 512 );
 	}
-
-	oamSet(
-		&oamMain, 1,
-		arra_s*0.45-50, 130-arra_s*0.85,
-		1, 0,
-		SpriteSize_64x64,
-		SpriteColorFormat_256Color,
-		arr_a,
-		1, true, false, false, false, false
-	);
-
-	oamRotateScale(
-		&oamMain,
-		1,
-		0,
-		160,
-		160
-	);
-	
-	oamSet(
-		&oamMain, 2,
-		arrb_s*0.3-30, 140-arrb_s*0.95-(icos((t+10)<<4))/200,
-		1, 0,
-		SpriteSize_64x64,
-		SpriteColorFormat_256Color,
-		arr_a,
-		0, true, false, false, false, false
-	);
-
-	oamRotateScale(
-		&oamMain,
-		0,
-		-(icos((t+10)<<4)),
-		180,
-		180
-	);
-	
-	oamSet(
-		&oamMain, 3,
-		-(isin(t<<4)>>9)*1.25+34, arrc_s*0.6+20+(isin(t<<4)>>7),
-		0, 0,
-		SpriteSize_64x64,
-		SpriteColorFormat_256Color,
-		arr_a,
-		-1, false, false, false, false, false
-	);
-
-	// Rape train
-	for( int i = 0; i < 20; i++ ) {
-		float tt = t/20.0;
-		oamSet(
-			&oamMain,
-			30+i, i*20-32*4+(int)(tt*20.0)%(20*3), 147+sin(tt*2.0)*5.0+sin((i*20-32*4+(int)(tt*20.0)%(20*3))/20.0)*10.0, 0, 0,
-			SpriteSize_64x64,
-			SpriteColorFormat_256Color,
-			arr_a,
-			-10, false, false, true, false, false
-		);
-		oamSet(
-			&oamMain,
-			10+i, 256-i*20+32*4-(int)(tt*25.0)%(20*3), 155+cos(tt*2.3)*5.0+cos((256-i*20+32*4-(int)(tt*25.0)%(20*3))/20.0)*10.0, 0, 0,
-			SpriteSize_64x64,
-			SpriteColorFormat_256Color,
-			arr_a,
-			-10, false, false, false, false, false
-		);
-		}
-	
-	oamUpdate(&oamMain);
 }
 
 u8 effect1_update( u32 t ) {
-	BG3X_A = -t*800;
-
+	BG3X_A = t*800;
+	BG3Y_A = -t*600;
+	
 	drawbars(t);
-	drawbars(t);	
+	drawbars(t);
 
+	float dx = (200.0-175.0) / (175.0-50.0);
+	float dy = (165.0-40.0) / (175.0-50.0);
+	for(int i = 0; i < 8; i++) {
+		for(int dot = 0; dot < 5; dot++) {
+			oamSet(
+				&oamMain, i*8+dot,
+				168+dx*(line_start[dot]-50)-16,40+dy*(line_start[dot]-50)-16,
+				0, 15-2*i,
+				SpriteSize_32x32,
+				SpriteColorFormat_Bmp,
+				dot_sprite[7-i],
+				32, false, false, false, false, false
+			);
+			oamMain.oamMemory[i*8+dot].blendMode = OBJMODE_BITMAP;
+		}
+	}
+	
+	oamUpdate(&oamMain);
 	
 	return( 0 );
 }

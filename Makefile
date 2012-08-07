@@ -14,7 +14,8 @@ OBJS = Main.o ARM.o \
        DS3D/Vector/MatrixFixed.o DS3D/Vector/QuaternionFixed.o \
        effect0.o \
        metaballs.o \
-
+       effect1.o \
+ 
 OBJS7 = Main.arm7.o
 
 #DEVKITPRO=../devkit/devkitPro
@@ -32,7 +33,17 @@ BITMAPS = gfx/svatgst_indexed.bin \
           gfx/haato_metaballs.bin \
 	  gfx/haato_raymarching.bin \
 	  gfx/haato_thatone.bin \
-	  gfx/ball_bg_stripes.bin
+	  gfx/ball_bg_stripes.bin \
+	  gfx/ecgdot_0.bin \
+	  gfx/ecgdot_1.bin \
+	  gfx/ecgdot_2.bin \
+	  gfx/ecgdot_3.bin \
+	  gfx/ecgdot_4.bin \
+	  gfx/ecgdot_5.bin \
+	  gfx/ecgdot_6.bin \
+	  gfx/ecgdot_7.bin \
+	  gfx/ecgdot_8.bin \
+	  gfx/ecgback.bin
 	  
 # Compiler setup
 CC = $(DEVKITARM)/bin/arm-eabi-gcc

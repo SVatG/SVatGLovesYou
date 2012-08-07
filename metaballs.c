@@ -373,7 +373,7 @@ void metaballs_update(s32 t) {
 	DSSwapBuffers(0);
 }
 
-// Empty, for sake of completeness.
 void metaballs_destroy() {
-
+	BLDCNT_A = 0;
+	BLDALPHA_A = 0;
 }
