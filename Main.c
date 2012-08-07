@@ -78,12 +78,13 @@ int main()
 	t = 0;
 
 	// Main loop
-	#define EFFECT_DEBUG
+// 	#define EFFECT_DEBUG
 	#ifdef EFFECT_DEBUG
 	effect0_init();
 	effect2_init();
 	metaballs_precompute();
 	#else
+	metaballs_precompute();	
 	effect0_init();
 	effect1_init();
 	#endif
@@ -120,21 +121,13 @@ int main()
 			}
 			metaballs_update(t);
 		}
-		else if( t < 30*60 ) {
-			if(next_effect_init < 1) {
-				next_effect_init++;
-				metaballs_init();
-			}
-		}
-		else if( t < 129*60 ) {
-// 			Truchet(t);
-// 			fadein(t,108*60);
-// 			if( t >= 129*60-2 ) {
-// 				effect7_init();
-// 			}
-		}
 		else {
-// 			effect7_update(t);
+			if(next_effect_init < 2) {
+				next_effect_init++;
+				metaballs_destroy();
+				effect2_init();
+			}
+			effect2_update(t);
 		}
 		#endif
 		

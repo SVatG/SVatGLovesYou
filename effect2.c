@@ -113,6 +113,9 @@ u8 effect2_update( u32 t ) {
 
 
 void effect2_destroy() {
+	for(int i = 0; i < 11; i++) {
+		oamFreeGfx(&oamMain,greet_border_sprite[i]);
+	}
 	BLDCNT_A = 0;
 	BLDALPHA_A = 0;
 }

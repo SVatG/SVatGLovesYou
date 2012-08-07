@@ -220,7 +220,7 @@ void metaballs_init() {
 
 	DSPolygonAttributes(DS_POLY_CULL_NONE|DS_POLY_LIGHT0|DS_POLY_ALPHA(0)|DS_POLY_MODE_MODULATION);
 	
-	copyTables();
+// 	copyTables();
 }
 
 s16 g_tris = 0;

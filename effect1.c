@@ -191,6 +191,12 @@ u8 effect1_update( u32 t ) {
 
 void effect1_destroy() {
 	irqDisable( IRQ_HBLANK );
+	for(int i = 0; i < 7; i++) {
+		oamFreeGfx(&oamMain,dot_sprite[i]);
+	}
+	for(int i = 0; i < 11; i++) {
+		oamFreeGfx(&oamMain,front_sprite[i]);
+	}
 	BLDCNT_A = 0;
 	BLDALPHA_A = 0;
 }
