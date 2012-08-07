@@ -78,10 +78,10 @@ int main()
 	t = 0;
 
 	// Main loop
-// 	#define EFFECT_DEBUG
+	#define EFFECT_DEBUG
 	#ifdef EFFECT_DEBUG
 	effect0_init();
-	effect2_init();
+	effect3_init();
 	metaballs_precompute();
 	#else
 	metaballs_precompute();	
@@ -102,7 +102,7 @@ int main()
 
 		#ifdef EFFECT_DEBUG
 		effect0_update(t);
-		effect2_update(t);
+		effect3_update(t);
 // 		metaballs_update(t);
 		if( t == 16*20+30 ) {
 			effect0_change(1);

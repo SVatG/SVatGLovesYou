@@ -108,3 +108,10 @@ uint16_t* loadSprite32B( char* path ) {
 	load8bVRAMIndirect( path, newSprite, 32*32*2 );
 	return( newSprite );
 }
+
+// 16x16
+uint16_t* loadSprite16A( char* path ) {
+	uint16_t* newSprite = oamAllocateGfx(&oamMain, SpriteSize_16x16, SpriteColorFormat_256Color);
+	load8bVRAMIndirect( path, newSprite, 16*16*2 );
+	return( newSprite );
+}

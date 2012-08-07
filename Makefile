@@ -15,8 +15,9 @@ OBJS = Main.o ARM.o \
        effect0.o \
        metaballs.o \
        effect1.o \
-       effect2.o
-
+       effect2.o \
+       effect3.o 
+ 
 OBJS7 = Main.arm7.o
 
 #DEVKITPRO=../devkit/devkitPro
@@ -74,7 +75,24 @@ BITMAPS = gfx/svatgst_indexed.bin \
 	  gfx/greets_border_08.bin \
 	  gfx/greets_border_09.bin \
 	  gfx/greets_border_10.bin \
-	  gfx/greets_border_11.bin 
+	  gfx/greets_border_11.bin \
+	  gfx/ribbon_downleft.bin \
+	  gfx/ribbon_downright.bin \
+	  gfx/ribbon_downup.bin \
+	  gfx/ribbon_headdown.bin \
+	  gfx/ribbon_headleft.bin \
+	  gfx/ribbon_headright.bin \
+	  gfx/ribbon_headup.bin \
+	  gfx/ribbon_leftdown.bin \
+	  gfx/ribbon_leftright.bin \
+	  gfx/ribbon_leftup.bin \
+	  gfx/ribbon_rightdown.bin \
+	  gfx/ribbon_rightleft.bin \
+	  gfx/ribbon_rightup.bin \
+	  gfx/ribbon_updown.bin \
+	  gfx/ribbon_upleft.bin \
+	  gfx/ribbon_upright.bin
+
 	  
 # Compiler setup
 CC = $(DEVKITARM)/bin/arm-eabi-gcc
