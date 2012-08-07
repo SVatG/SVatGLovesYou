@@ -78,7 +78,7 @@ int main()
 	t = 0;
 
 	// Main loop
-// 	#define EFFECT_DEBUG
+	#define EFFECT_DEBUG
 	#ifdef EFFECT_DEBUG
 	effect0_init();
 	effect2_init();
@@ -109,7 +109,7 @@ int main()
 
 		effect0_update(t);
 		if( t < 10*60 ) {
-
+			effect1_update();
 		}
 		else if(t < 27*60) {
 // 			effect6_update(t);

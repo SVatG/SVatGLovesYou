@@ -105,7 +105,7 @@ $(NAME).nds: $(NAME).arm9 $(NAME).arm7
 	$(DEVKITARM)/bin/grit gfx_source/pal_images/pal_reduced.png -gB8 -gb -ftb -ogfx/palette.png
 	rm gfx/palette.img.bin
 	cp gfx/*.bin Datafiles/gfx
-	$(DEVKITARM)/bin/ndstool -c $@ -9 $(NAME).arm9 -7  ../devkit/devkitPro/libnds/default.arm7 -d Datafiles
+	$(DEVKITARM)/bin/ndstool -c $@ -9 $(NAME).arm9 -7 default.arm7 -d Datafiles
 
 # Arm9 / Arm7 binary rules
 $(NAME).arm9: $(NAME).arm9.elf
