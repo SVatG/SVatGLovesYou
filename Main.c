@@ -78,7 +78,7 @@ int main()
 	t = 0;
 
 	// Main loop
-	#define EFFECT_DEBUG
+// 	#define EFFECT_DEBUG
 	#ifdef EFFECT_DEBUG
 	effect0_init();
 	effect2_init();
@@ -106,15 +106,10 @@ int main()
 			effect0_change(1);
 		}
 		#else
-		
-		if( t < 16*60+30 ) {
-// 			RunRadial(t,dtcm_buffer);
-// 			fadeout(t,16*60+30);
-// 			if( t >= 16*60+30-2 ) {
-// 				StopRadial();
-// 				cubemode = 0;
-// 				effect6_init();
-// 			}
+
+		effect0_update(t);
+		if( t < 10*60 ) {
+
 		}
 		else if(t < 27*60) {
 // 			effect6_update(t);
