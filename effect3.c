@@ -13,22 +13,25 @@
 
 #define RIBBON_COUNT 4
 #define MAX_SEGMENTS 512
-#define MAX_PERROW 60
+#define MAX_PERROW 56
 
-u16* ribbonSprite[4][4];
+u16* ribbonSprite[4][4][4];
 u16* zeroSprite[4];
+u16* heartSprite;
 
 typedef struct ribbon_tile {
 	int x;
 	int y;
 	int from;
 	int to;
+	int tile;
 } ribbon_tile;
 
 typedef struct ribbon {
 	ribbon_tile tiles[MAX_SEGMENTS];
 	int tile_count;
 	int head_status;
+	int head_tile;
 	int head_dir;
 	int x;
 	int y;
@@ -46,14 +49,13 @@ typedef struct row_tile {
 row_tile row_tiles[12][MAX_PERROW];
 int row_tile_counts[12];
 
-uint16_t* palram = PALRAM_A;
 void switchSprites() {
 	int row = ((VCOUNT+16)>>4)&0xF;
 	int line = (VCOUNT)&0xF;
 	if(line <= 13) {
 		for(int i = line*4; i < line*4+4; i++) {
 			oamSet(
-				&oamMain, RIBBON_COUNT + i + 66*(row&0x1),
+				&oamMain, RIBBON_COUNT*2 + i + 62*(row&0x1),
 				row_tiles[row][i].x,row_tiles[row][i].y,
 				row_tiles[row][i].prio, 0,
 				SpriteSize_16x16,
@@ -80,7 +82,7 @@ void reset_rows() {
 		for(int j = 0; j < MAX_PERROW; j++) {
 			row_tiles[i][j].x = -16;
 			row_tiles[i][j].y = -16;
-			row_tiles[i][j].sprite = ribbonSprite[DIR_RIGHT][DIR_UP];
+			row_tiles[i][j].sprite = ribbonSprite[DIR_RIGHT][DIR_UP][0];
 			row_tiles[i][j].prio = 0;
 		}
 	}
@@ -92,54 +94,193 @@ void reset_ribbons() {
 	ribbons[0].tiles[0].y = 6;
 	ribbons[0].tiles[0].from = DIR_UP;
 	ribbons[0].tiles[0].to = DIR_DOWN;
+	ribbons[0].tiles[0].tile = 3;
 
 	ribbons[0].tile_count = 1;
 	ribbons[0].x = 8;
 	ribbons[0].y = 6;
 	ribbons[0].head_dir = DIR_DOWN;
 	ribbons[0].head_status = 3;
-
+	ribbons[0].head_tile = 0;
+	
 	ribbons[1].tiles[0].x = 8;
 	ribbons[1].tiles[0].y = 6;
 	ribbons[1].tiles[0].from = DIR_LEFT;
 	ribbons[1].tiles[0].to = DIR_RIGHT;
-
+	ribbons[1].tiles[0].tile = 3;
+	
 	ribbons[1].tile_count = 1;
 	ribbons[1].x = 8;
 	ribbons[1].y = 6;
 	ribbons[1].head_dir = DIR_RIGHT;
 	ribbons[1].head_status = 3;
-
+	ribbons[1].head_tile = 0;
+	
 	ribbons[2].tiles[0].x = 8;
 	ribbons[2].tiles[0].y = 6;
 	ribbons[2].tiles[0].from = DIR_DOWN;
 	ribbons[2].tiles[0].to = DIR_UP;
+	ribbons[2].tiles[0].tile = 3;
 
 	ribbons[2].tile_count = 1;
 	ribbons[2].x = 8;
 	ribbons[2].y = 6;
 	ribbons[2].head_dir = DIR_UP;
 	ribbons[2].head_status = 3;
+	ribbons[2].head_tile = 0;
 
 	ribbons[3].tiles[0].x = 8;
 	ribbons[3].tiles[0].y = 6;
 	ribbons[3].tiles[0].from = DIR_RIGHT;
 	ribbons[3].tiles[0].to = DIR_LEFT;
+	ribbons[3].tiles[0].tile = 3;
 
 	ribbons[3].tile_count = 1;
 	ribbons[3].x = 8;
 	ribbons[3].y = 6;
 	ribbons[3].head_dir = DIR_LEFT;
 	ribbons[3].head_status = 3;
+	ribbons[3].head_tile = 0;
+}
+
+void loadSprites() {
+	// Heart
+	heartSprite = loadBmpSpriteAGreen( "nitro:/gfx/ribbon_heart.img.bin" );
+	
+	// Zero-Heads
+	zeroSprite[DIR_UP] = loadSprite16A( "nitro:/gfx/ribbon_zero_up_1.img.bin" );
+	zeroSprite[DIR_RIGHT] = loadSprite16A( "nitro:/gfx/ribbon_zero_right_1.img.bin" );
+	zeroSprite[DIR_LEFT] = loadSprite16A( "nitro:/gfx/ribbon_zero_left_1.img.bin" );
+	zeroSprite[DIR_DOWN] = loadSprite16A( "nitro:/gfx/ribbon_zero_down_1.img.bin" );
+
+	// 4 frames each.
+
+	// Frame 1
+	// Heads
+	ribbonSprite[DIR_UP][DIR_UP][0] = loadSprite16A( "nitro:/gfx/ribbon_head_up_1.img.bin" );
+	ribbonSprite[DIR_RIGHT][DIR_RIGHT][0] = loadSprite16A( "nitro:/gfx/ribbon_head_right_1.img.bin" );
+	ribbonSprite[DIR_LEFT][DIR_LEFT][0] = loadSprite16A( "nitro:/gfx/ribbon_head_left_1.img.bin" );
+	ribbonSprite[DIR_DOWN][DIR_DOWN][0] = loadSprite16A( "nitro:/gfx/ribbon_head_down_1.img.bin" );
+
+	// Straights
+	ribbonSprite[DIR_UP][DIR_DOWN][0] = loadSprite16A( "nitro:/gfx/ribbon_up_down_1.img.bin" );
+	ribbonSprite[DIR_DOWN][DIR_UP][0] = loadSprite16A( "nitro:/gfx/ribbon_down_up_1.img.bin" );
+	ribbonSprite[DIR_LEFT][DIR_RIGHT][0] = loadSprite16A( "nitro:/gfx/ribbon_left_right_1.img.bin" );
+	ribbonSprite[DIR_RIGHT][DIR_LEFT][0] = loadSprite16A( "nitro:/gfx/ribbon_right_left_1.img.bin" );
+
+	// Curves from up
+	ribbonSprite[DIR_UP][DIR_RIGHT][0] = loadSprite16A( "nitro:/gfx/ribbon_up_right_1.img.bin" );
+	ribbonSprite[DIR_UP][DIR_LEFT][0] = loadSprite16A( "nitro:/gfx/ribbon_up_left_1.img.bin" );
+
+	// Curves from down
+	ribbonSprite[DIR_DOWN][DIR_RIGHT][0] = loadSprite16A( "nitro:/gfx/ribbon_down_right_1.img.bin" );
+	ribbonSprite[DIR_DOWN][DIR_LEFT][0] = loadSprite16A( "nitro:/gfx/ribbon_down_left_1.img.bin" );
+
+	// Curves from left
+	ribbonSprite[DIR_LEFT][DIR_UP][0] = loadSprite16A( "nitro:/gfx/ribbon_left_up_1.img.bin" );
+	ribbonSprite[DIR_LEFT][DIR_DOWN][0] = loadSprite16A( "nitro:/gfx/ribbon_left_down_1.img.bin" );
+
+	// Curves from right
+	ribbonSprite[DIR_RIGHT][DIR_UP][0] = loadSprite16A( "nitro:/gfx/ribbon_right_up_1.img.bin" );
+	ribbonSprite[DIR_RIGHT][DIR_DOWN][0] = loadSprite16A( "nitro:/gfx/ribbon_right_down_1.img.bin" );
+
+	// Frame 2
+	ribbonSprite[DIR_UP][DIR_UP][1] = loadSprite16A( "nitro:/gfx/ribbon_head_up_2.img.bin" );
+	ribbonSprite[DIR_RIGHT][DIR_RIGHT][1] = loadSprite16A( "nitro:/gfx/ribbon_head_right_2.img.bin" );
+	ribbonSprite[DIR_LEFT][DIR_LEFT][1] = loadSprite16A( "nitro:/gfx/ribbon_head_left_2.img.bin" );
+	ribbonSprite[DIR_DOWN][DIR_DOWN][1] = loadSprite16A( "nitro:/gfx/ribbon_head_down_2.img.bin" );
+
+	// Straights
+	ribbonSprite[DIR_UP][DIR_DOWN][1] = loadSprite16A( "nitro:/gfx/ribbon_up_down_2.img.bin" );
+	ribbonSprite[DIR_DOWN][DIR_UP][1] = loadSprite16A( "nitro:/gfx/ribbon_down_up_2.img.bin" );
+	ribbonSprite[DIR_LEFT][DIR_RIGHT][1] = loadSprite16A( "nitro:/gfx/ribbon_left_right_2.img.bin" );
+	ribbonSprite[DIR_RIGHT][DIR_LEFT][1] = loadSprite16A( "nitro:/gfx/ribbon_right_left_2.img.bin" );
+
+	// Curves from up
+	ribbonSprite[DIR_UP][DIR_RIGHT][1] = loadSprite16A( "nitro:/gfx/ribbon_up_right_2.img.bin" );
+	ribbonSprite[DIR_UP][DIR_LEFT][1] = loadSprite16A( "nitro:/gfx/ribbon_up_left_2.img.bin" );
+
+	// Curves from down
+	ribbonSprite[DIR_DOWN][DIR_RIGHT][1] = loadSprite16A( "nitro:/gfx/ribbon_down_right_2.img.bin" );
+	ribbonSprite[DIR_DOWN][DIR_LEFT][1] = loadSprite16A( "nitro:/gfx/ribbon_down_left_2.img.bin" );
+
+	// Curves from left
+	ribbonSprite[DIR_LEFT][DIR_UP][1] = loadSprite16A( "nitro:/gfx/ribbon_left_up_2.img.bin" );
+	ribbonSprite[DIR_LEFT][DIR_DOWN][1] = loadSprite16A( "nitro:/gfx/ribbon_left_down_2.img.bin" );
+
+	// Curves from right
+	ribbonSprite[DIR_RIGHT][DIR_UP][1] = loadSprite16A( "nitro:/gfx/ribbon_right_up_2.img.bin" );
+	ribbonSprite[DIR_RIGHT][DIR_DOWN][1] = loadSprite16A( "nitro:/gfx/ribbon_right_down_2.img.bin" );
+
+	// Frame 3
+	// Heads
+	ribbonSprite[DIR_UP][DIR_UP][2] = loadSprite16A( "nitro:/gfx/ribbon_head_up_3.img.bin" );
+	ribbonSprite[DIR_RIGHT][DIR_RIGHT][2] = loadSprite16A( "nitro:/gfx/ribbon_head_right_3.img.bin" );
+	ribbonSprite[DIR_LEFT][DIR_LEFT][2] = loadSprite16A( "nitro:/gfx/ribbon_head_left_3.img.bin" );
+	ribbonSprite[DIR_DOWN][DIR_DOWN][2] = loadSprite16A( "nitro:/gfx/ribbon_head_down_3.img.bin" );
+
+	// Straights
+	ribbonSprite[DIR_UP][DIR_DOWN][2] = loadSprite16A( "nitro:/gfx/ribbon_up_down_3.img.bin" );
+	ribbonSprite[DIR_DOWN][DIR_UP][2] = loadSprite16A( "nitro:/gfx/ribbon_down_up_3.img.bin" );
+	ribbonSprite[DIR_LEFT][DIR_RIGHT][2] = loadSprite16A( "nitro:/gfx/ribbon_left_right_3.img.bin" );
+	ribbonSprite[DIR_RIGHT][DIR_LEFT][2] = loadSprite16A( "nitro:/gfx/ribbon_right_left_3.img.bin" );
+
+	// Curves from up
+	ribbonSprite[DIR_UP][DIR_RIGHT][2] = loadSprite16A( "nitro:/gfx/ribbon_up_right_3.img.bin" );
+	ribbonSprite[DIR_UP][DIR_LEFT][2] = loadSprite16A( "nitro:/gfx/ribbon_up_left_3.img.bin" );
+
+	// Curves from down
+	ribbonSprite[DIR_DOWN][DIR_RIGHT][2] = loadSprite16A( "nitro:/gfx/ribbon_down_right_3.img.bin" );
+	ribbonSprite[DIR_DOWN][DIR_LEFT][2] = loadSprite16A( "nitro:/gfx/ribbon_down_left_3.img.bin" );
+
+	// Curves from left
+	ribbonSprite[DIR_LEFT][DIR_UP][2] = loadSprite16A( "nitro:/gfx/ribbon_left_up_3.img.bin" );
+	ribbonSprite[DIR_LEFT][DIR_DOWN][2] = loadSprite16A( "nitro:/gfx/ribbon_left_down_3.img.bin" );
+
+	// Curves from right
+	ribbonSprite[DIR_RIGHT][DIR_UP][2] = loadSprite16A( "nitro:/gfx/ribbon_right_up_3.img.bin" );
+	ribbonSprite[DIR_RIGHT][DIR_DOWN][2] = loadSprite16A( "nitro:/gfx/ribbon_right_down_3.img.bin" );
+
+	// Frame 4
+	// Heads
+	ribbonSprite[DIR_UP][DIR_UP][3] = loadSprite16A( "nitro:/gfx/ribbon_head_up_4.img.bin" );
+	ribbonSprite[DIR_RIGHT][DIR_RIGHT][3] = loadSprite16A( "nitro:/gfx/ribbon_head_right_4.img.bin" );
+	ribbonSprite[DIR_LEFT][DIR_LEFT][3] = loadSprite16A( "nitro:/gfx/ribbon_head_left_4.img.bin" );
+	ribbonSprite[DIR_DOWN][DIR_DOWN][3] = loadSprite16A( "nitro:/gfx/ribbon_head_down_4.img.bin" );
+
+	// Straights
+	ribbonSprite[DIR_UP][DIR_DOWN][3] = loadSprite16A( "nitro:/gfx/ribbon_up_down_4.img.bin" );
+	ribbonSprite[DIR_DOWN][DIR_UP][3] = loadSprite16A( "nitro:/gfx/ribbon_down_up_4.img.bin" );
+	ribbonSprite[DIR_LEFT][DIR_RIGHT][3] = loadSprite16A( "nitro:/gfx/ribbon_left_right_4.img.bin" );
+	ribbonSprite[DIR_RIGHT][DIR_LEFT][3] = loadSprite16A( "nitro:/gfx/ribbon_right_left_4.img.bin" );
+
+	// Curves from up
+	ribbonSprite[DIR_UP][DIR_RIGHT][3] = loadSprite16A( "nitro:/gfx/ribbon_up_right_4.img.bin" );
+	ribbonSprite[DIR_UP][DIR_LEFT][3] = loadSprite16A( "nitro:/gfx/ribbon_up_left_4.img.bin" );
+
+	// Curves from down
+	ribbonSprite[DIR_DOWN][DIR_RIGHT][3] = loadSprite16A( "nitro:/gfx/ribbon_down_right_4.img.bin" );
+	ribbonSprite[DIR_DOWN][DIR_LEFT][3] = loadSprite16A( "nitro:/gfx/ribbon_down_left_4.img.bin" );
+
+	// Curves from left
+	ribbonSprite[DIR_LEFT][DIR_UP][3] = loadSprite16A( "nitro:/gfx/ribbon_left_up_4.img.bin" );
+	ribbonSprite[DIR_LEFT][DIR_DOWN][3] = loadSprite16A( "nitro:/gfx/ribbon_left_down_4.img.bin" );
+
+	// Curves from right
+	ribbonSprite[DIR_RIGHT][DIR_UP][3] = loadSprite16A( "nitro:/gfx/ribbon_right_up_4.img.bin" );
+	ribbonSprite[DIR_RIGHT][DIR_DOWN][3] = loadSprite16A( "nitro:/gfx/ribbon_right_down_4.img.bin" );
 }
 
 void effect3_init() {
 	
-	DISPCNT_A = DISPCNT_MODE_5 | DISPCNT_OBJ_ON | DISPCNT_BG2_ON | DISPCNT_ON;
+	DISPCNT_A = DISPCNT_MODE_5 | DISPCNT_OBJ_ON | DISPCNT_BG2_ON | DISPCNT_BG3_ON | DISPCNT_ON;
 
+	VRAMCNT_A = VRAMCNT_A_OBJ_VRAM_A;
 	VRAMCNT_B = VRAMCNT_B_BG_VRAM_A_OFFS_0K;
-	BG2CNT_A = BGxCNT_EXTENDED_BITMAP_8 | BGxCNT_OVERFLOW_WRAP | BGxCNT_BITMAP_SIZE_256x256 | BGxCNT_BITMAP_BASE_0K;
-	BG2CNT_A = (BG2CNT_A&~BGxCNT_PRIORITY_MASK)|BGxCNT_PRIORITY_1;
+	VRAMCNT_D = VRAMCNT_D_BG_VRAM_A_OFFS_128K;
+	
+	BG2CNT_A = BGxCNT_EXTENDED_BITMAP_16 | BGxCNT_OVERFLOW_WRAP | BGxCNT_BITMAP_SIZE_256x256 | BGxCNT_BITMAP_BASE_0K;
+	BG2CNT_A = (BG2CNT_A&~BGxCNT_PRIORITY_MASK)|BGxCNT_PRIORITY_0;
 	BG2_XDX = (1 << 8);
 	BG2_XDY = 0;
 	BG2_YDX = 0;
@@ -147,46 +288,28 @@ void effect3_init() {
 	BG2_CX = 0;
 	BG2_CY = 0;
 
-	VRAMCNT_A = VRAMCNT_A_OBJ_VRAM_A;
+	BG3CNT_A = BGxCNT_EXTENDED_BITMAP_16 | BGxCNT_OVERFLOW_WRAP | BGxCNT_BITMAP_SIZE_256x256 | BGxCNT_BITMAP_BASE_128K;
+	BG3CNT_A = (BG3CNT_A&~BGxCNT_PRIORITY_MASK)|BGxCNT_PRIORITY_3;
+	BG3_XDX = (1 << 8);
+	BG3_XDY = 0;
+	BG3_YDX = 0;
+	BG3_YDY = (1 << 8);
+	BG3_CX = 0;
+	BG3_CY = 0;
+
+	loadImageVRAMIndirectGreen( "nitro:/gfx/ribbon_frame.img.bin", VRAM_A_OFFS_0K,256*256*2);
+	loadImage( "nitro:/gfx/stripe_bg.img.bin", VRAM_A_OFFS_128K,256*256*2);
+
+	vu16* mem_BLDCNT_A = (vu16*)(0x04000050);
+	*mem_BLDCNT_A = BLDCNT_SRC_A_OBJ | BLDCNT_SRC_B_BG3 | BLDCNT_EFFECT_ALPHA;
+	BLDALPHA_A = BLDALPHA_EVA(10)|BLDALPHA_EVB(6);
 
 	oamInit(&oamMain, SpriteMapping_Bmp_1D_128, false);
 
-	// Zero-Heads
-	zeroSprite[DIR_UP] = loadSprite16A( "nitro:/gfx/ribbon_headup_zero.img.bin" );
-	zeroSprite[DIR_RIGHT] = loadSprite16A( "nitro:/gfx/ribbon_headright_zero.img.bin" );
-	zeroSprite[DIR_LEFT] = loadSprite16A( "nitro:/gfx/ribbon_headleft_zero.img.bin" );
-	zeroSprite[DIR_DOWN] = loadSprite16A( "nitro:/gfx/ribbon_headdown_zero.img.bin" );
+	loadSprites();
 	
-	// Heads
-	ribbonSprite[DIR_UP][DIR_UP] = loadSprite16A( "nitro:/gfx/ribbon_headup.img.bin" );
-	ribbonSprite[DIR_RIGHT][DIR_RIGHT] = loadSprite16A( "nitro:/gfx/ribbon_headright.img.bin" );
-	ribbonSprite[DIR_LEFT][DIR_LEFT] = loadSprite16A( "nitro:/gfx/ribbon_headleft.img.bin" );
-	ribbonSprite[DIR_DOWN][DIR_DOWN] = loadSprite16A( "nitro:/gfx/ribbon_headdown.img.bin" );
-
-	// Straights
-	ribbonSprite[DIR_UP][DIR_DOWN] = loadSprite16A( "nitro:/gfx/ribbon_updown.img.bin" );
-	ribbonSprite[DIR_DOWN][DIR_UP] = loadSprite16A( "nitro:/gfx/ribbon_downup.img.bin" );
-	ribbonSprite[DIR_LEFT][DIR_RIGHT] = loadSprite16A( "nitro:/gfx/ribbon_leftright.img.bin" );
-	ribbonSprite[DIR_RIGHT][DIR_LEFT] = loadSprite16A( "nitro:/gfx/ribbon_rightleft.img.bin" );
-
-	// Curves from up
-	ribbonSprite[DIR_UP][DIR_RIGHT] = loadSprite16A( "nitro:/gfx/ribbon_upright.img.bin" );
-	ribbonSprite[DIR_UP][DIR_LEFT] = loadSprite16A( "nitro:/gfx/ribbon_upleft.img.bin" );
-
-	// Curves from down
-	ribbonSprite[DIR_DOWN][DIR_RIGHT] = loadSprite16A( "nitro:/gfx/ribbon_downright.img.bin" );
-	ribbonSprite[DIR_DOWN][DIR_LEFT] = loadSprite16A( "nitro:/gfx/ribbon_downleft.img.bin" );
-
-	// Curves from left
-	ribbonSprite[DIR_LEFT][DIR_UP] = loadSprite16A( "nitro:/gfx/ribbon_leftup.img.bin" );
-	ribbonSprite[DIR_LEFT][DIR_DOWN] = loadSprite16A( "nitro:/gfx/ribbon_leftdown.img.bin" );
-
-	// Curves from right
-	ribbonSprite[DIR_RIGHT][DIR_UP] = loadSprite16A( "nitro:/gfx/ribbon_rightup.img.bin" );
-	ribbonSprite[DIR_RIGHT][DIR_DOWN] = loadSprite16A( "nitro:/gfx/ribbon_rightdown.img.bin" );
-
 	// Palette
-	load8bVRAMIndirect("nitro:/gfx/ribbon_rightleft.pal.bin", PALRAM_OBJ_A,256);
+	load8bVRAMIndirect("nitro:/gfx/ribbon_right_left_1.pal.bin", PALRAM_OBJ_A,256);
 
 	reset_ribbons();
 	reset_rows();
@@ -239,6 +362,8 @@ void update_ribbons() {
 
 			} while(ribbons[ribbon_cnt].head_dir == forbidden_dir_2);
 			ribbons[ribbon_cnt].tiles[ribbons[ribbon_cnt].tile_count].to = ribbons[ribbon_cnt].head_dir;
+			ribbons[ribbon_cnt].tiles[ribbons[ribbon_cnt].tile_count].tile = ribbons[ribbon_cnt].head_tile;
+			ribbons[ribbon_cnt].head_tile = (ribbons[ribbon_cnt].head_tile + 1)%4;
 			ribbons[ribbon_cnt].tile_count++;
 		}
 	}
@@ -254,7 +379,7 @@ void ribbons_to_rowribbons() {
 			ribbons[ribbon_cnt].tiles[ribbons[ribbon_cnt].tile_count-1].from
 		][
 			ribbons[ribbon_cnt].tiles[ribbons[ribbon_cnt].tile_count-1].to
-		];
+		][ribbons[ribbon_cnt].tiles[ribbons[ribbon_cnt].tile_count-1].tile];
 		if(ribbons[ribbon_cnt].head_status == 0) {
 			int old_head;
 			if(ribbons[ribbon_cnt].tiles[ribbons[ribbon_cnt].tile_count-1].from == DIR_RIGHT) {
@@ -269,7 +394,7 @@ void ribbons_to_rowribbons() {
 			if(ribbons[ribbon_cnt].tiles[ribbons[ribbon_cnt].tile_count-1].from == DIR_UP) {
 				old_head = DIR_DOWN;
 			}
-			newestSprite = ribbonSprite[old_head][old_head];
+			newestSprite = ribbonSprite[old_head][old_head][ribbons[ribbon_cnt].tiles[ribbons[ribbon_cnt].tile_count-1].tile];
 		}
 
 		int idx_y = ribbons[ribbon_cnt].tiles[ribbons[ribbon_cnt].tile_count-1].y;
@@ -279,7 +404,7 @@ void ribbons_to_rowribbons() {
 		row_tiles[idx_y][row_tile_counts[idx_y]].x = ribbons[ribbon_cnt].tiles[ribbons[ribbon_cnt].tile_count-1].x*16;
 		row_tiles[idx_y][row_tile_counts[idx_y]].y = ribbons[ribbon_cnt].tiles[ribbons[ribbon_cnt].tile_count-1].y*16;
 		row_tiles[idx_y][row_tile_counts[idx_y]].sprite = newestSprite;
-		row_tiles[idx_y][row_tile_counts[idx_y]].prio = 0;
+		row_tiles[idx_y][row_tile_counts[idx_y]].prio = 1;
 		row_tile_counts[idx_y]++;
 	}
 
@@ -301,15 +426,36 @@ void ribbons_to_rowribbons() {
 			row_tiles[idx_y][row_tile_counts[idx_y]].y = ribbons[ribbon_cnt].tiles[tile_cnt].y*16;
 			row_tiles[idx_y][row_tile_counts[idx_y]].sprite = ribbonSprite[
 				ribbons[ribbon_cnt].tiles[tile_cnt].from][ribbons[ribbon_cnt].tiles[tile_cnt].to
-			];
-			row_tiles[idx_y][row_tile_counts[idx_y]].prio = 1;
+			][ribbons[ribbon_cnt].tiles[tile_cnt].tile];
+			row_tiles[idx_y][row_tile_counts[idx_y]].prio = 2;
 			row_tile_counts[idx_y]++;
 		}
 	}
 
+	// Heart. Twice. For reasons.
+	int sprite_cnt = 0;	
+	oamSet(
+		&oamMain, sprite_cnt,
+		256/2-32,192/2-32,
+		0, 15,
+		SpriteSize_64x64,
+		SpriteColorFormat_Bmp,
+		heartSprite,
+		32, false, false, false, false, false
+	);
+	oamSet(
+		&oamMain, 64+sprite_cnt,
+		256/2-32,192/2-32,
+		0, 15,
+		SpriteSize_64x64,
+		SpriteColorFormat_Bmp,
+		heartSprite,
+		32, false, false, false, false, false
+	);
+	sprite_cnt++;
+	
 	// Draw heads directly, in TWO DIFFERENT PLACES.
-	// This is for reasons.
-	int sprite_cnt = 0;
+	// This is for reasons. As above.
 	for(int ribbon_cnt = 0; ribbon_cnt < RIBBON_COUNT; ribbon_cnt++) {
 		int head_xd = 0;
 		int head_yd = 0;
@@ -328,23 +474,23 @@ void ribbons_to_rowribbons() {
 		oamSet(
 			&oamMain, sprite_cnt,
 			ribbons[ribbon_cnt].x*16+head_xd,ribbons[ribbon_cnt].y*16+head_yd,
-			ribbons[ribbon_cnt].head_status <= 1 ? 0 : 1, 0,
+			ribbons[ribbon_cnt].head_status <= 1 ? 1 : 2, 0,
 			SpriteSize_16x16,
 			SpriteColorFormat_256Color,
 			ribbons[ribbon_cnt].head_status <= 1 ?
 				zeroSprite[ribbons[ribbon_cnt].head_dir] :
-				ribbonSprite[ribbons[ribbon_cnt].head_dir][ribbons[ribbon_cnt].head_dir],
+				ribbonSprite[ribbons[ribbon_cnt].head_dir][ribbons[ribbon_cnt].head_dir][ribbons[ribbon_cnt].head_tile],
 			32, false, false, false, false, false
 		);
 		oamSet(
 			&oamMain, 64+sprite_cnt,
 			ribbons[ribbon_cnt].x*16+head_xd,ribbons[ribbon_cnt].y*16+head_yd,
-			ribbons[ribbon_cnt].head_status <= 1 ? 0 : 1, 0,
+			ribbons[ribbon_cnt].head_status <= 1 ? 1 : 2, 0,
 			SpriteSize_16x16,
 			SpriteColorFormat_256Color,
 			ribbons[ribbon_cnt].head_status <= 1 ?
 				zeroSprite[ribbons[ribbon_cnt].head_dir] :
-				ribbonSprite[ribbons[ribbon_cnt].head_dir][ribbons[ribbon_cnt].head_dir],
+				ribbonSprite[ribbons[ribbon_cnt].head_dir][ribbons[ribbon_cnt].head_dir][ribbons[ribbon_cnt].head_tile],
 			32, false, false, false, false, false
 		);
 		sprite_cnt++;
@@ -377,7 +523,7 @@ void draw_ribbons_direct() {
 			ribbons[ribbon_cnt].tiles[ribbons[ribbon_cnt].tile_count-1].from
 		][
 			ribbons[ribbon_cnt].tiles[ribbons[ribbon_cnt].tile_count-1].to
-		];
+		][ribbons[ribbon_cnt].tiles[ribbons[ribbon_cnt].tile_count-1].tile];
 		if(ribbons[ribbon_cnt].head_status == 0) {
 			int old_head;
 			if(ribbons[ribbon_cnt].tiles[ribbons[ribbon_cnt].tile_count-1].from == DIR_RIGHT) {
@@ -392,7 +538,7 @@ void draw_ribbons_direct() {
 			if(ribbons[ribbon_cnt].tiles[ribbons[ribbon_cnt].tile_count-1].from == DIR_UP) {
 				old_head = DIR_DOWN;
 			}
-			newestSprite = ribbonSprite[old_head][old_head];
+			newestSprite = ribbonSprite[old_head][old_head][ribbons[ribbon_cnt].tiles[ribbons[ribbon_cnt].tile_count-1].tile];
 		}
 
 		oamSet(
@@ -430,7 +576,7 @@ void draw_ribbons_direct() {
 			SpriteColorFormat_256Color,
 			ribbons[ribbon_cnt].head_status <= 1 ?
 				zeroSprite[ribbons[ribbon_cnt].head_dir] :
-				ribbonSprite[ribbons[ribbon_cnt].head_dir][ribbons[ribbon_cnt].head_dir],
+				ribbonSprite[ribbons[ribbon_cnt].head_dir][ribbons[ribbon_cnt].head_dir][ribbons[ribbon_cnt].head_tile],
 			32, false, false, false, false, false
 		);
 		sprite_cnt++;
@@ -443,7 +589,9 @@ void draw_ribbons_direct() {
 				1, 0,
 				SpriteSize_16x16,
 				SpriteColorFormat_256Color,
-				ribbonSprite[ribbons[ribbon_cnt].tiles[tile_cnt].from][ribbons[ribbon_cnt].tiles[tile_cnt].to],
+				ribbonSprite[
+					ribbons[ribbon_cnt].tiles[tile_cnt].from][ribbons[ribbon_cnt].tiles[tile_cnt].to
+				][ribbons[ribbon_cnt].tiles[tile_cnt].tile],
 				32, false, false, false, false, false
 			);
 			sprite_cnt++;
@@ -454,8 +602,15 @@ void draw_ribbons_direct() {
 }
 
 u8 effect3_update( u32 t ) {
+
+	uint16_t* palram = PALRAM_OBJ_A;
+	for(int p = 0; p < 32; p++) {
+		int ps = (p-t)%32;
+		palram[p+4] = MakeRGB15(abs(ps-16)+10,2,2);
+	}
 	
 	update_ribbons();
+	
 	ribbons_to_rowribbons();
 	
 	return( 0 );
