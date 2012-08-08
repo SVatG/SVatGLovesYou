@@ -92,8 +92,11 @@ BITMAPS = gfx/svatgst_indexed.bin \
 	  gfx/ribbon_rightup.bin \
 	  gfx/ribbon_updown.bin \
 	  gfx/ribbon_upleft.bin \
-	  gfx/ribbon_upright.bin
-
+	  gfx/ribbon_upright.bin \
+	  gfx/ribbon_headdown_zero.bin \
+	  gfx/ribbon_headleft_zero.bin \
+	  gfx/ribbon_headright_zero.bin \
+	  gfx/ribbon_headup_zero.bin
 	  
 # Compiler setup
 CC = $(DEVKITARM)/bin/arm-eabi-gcc

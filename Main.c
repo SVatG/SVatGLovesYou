@@ -82,8 +82,8 @@ int main()
 	#define EFFECT_DEBUG
 	#ifdef EFFECT_DEBUG
 	effect0_init();
-// 	effect3_init();
-	InitField();	
+	effect3_init();
+// 	InitField();	
 	metaballs_precompute();
 	#else
 	metaballs_precompute();	
@@ -104,8 +104,8 @@ int main()
 
 		#ifdef EFFECT_DEBUG
 		effect0_update(t);
-// 		effect3_update(t);
-		RunField(t);
+		effect3_update(t);
+// 		RunField(t);
 // 		metaballs_update(t);
 		if( t == 16*20+30 ) {
 			effect0_change(1);
