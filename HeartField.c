@@ -54,7 +54,7 @@ static inline float CalcNormalV(float u1,float v1,float u2,float v2)
 #define N4_X CalcNormalU(X3,Y3,0,Y2)
 #define N4_Y CalcNormalV(X3,Y3,0,Y2)
 
-#define NumHearts 128
+#define NumHearts 100
 
 struct Heart
 {
@@ -184,6 +184,17 @@ static void MakeParts()
 	if(DSFinishList()>PartSize) for(;;);
 }
 
+static int a=0;
+static int b=0;
+
+static void PlaceHeart(struct Heart *heart)
+{
+	heart->x=isin(a)+7*isin(b*3);
+	heart->y=icos(a)+7*icos(b*3);
+	a+=b;
+	b+=0x2;
+}
+
 void InitHeartField()
 {
 	DISPCNT_A=DISPCNT_MODE_0|DISPCNT_ON|DISPCNT_3D|DISPCNT_BG0_ON;
@@ -191,29 +202,28 @@ void InitHeartField()
 	DSInit3D();
 	DSViewport(0,0,255,191);
 
-	DSSetControl(DS_ANTIALIAS|DS_FOG|DS_TOON_SHADING|DS_OUTLINE);
+	DSSetControl(DS_FOG|DS_TOON_SHADING|DS_OUTLINE);
 	DSClearParams(0,0,0,31,63);
 
-	for(int i=0;i<8;i++) DSSetOutlineColor3b(i,31,31-i*4,31-i*4,0);
+	for(int i=0;i<8;i++) DSSetOutlineColor3b(i,31,31,31,0);
 
-	DSSetToonTableRange3b(0,31,24,4,4,0);
-	DSSetToonTableRange3b(6,31,31,4,4,0);
-	DSSetToonTableRange3b(14,31,31,8,8,0);
-	DSSetToonTableRange3b(20,31,31,16,16,0);
+	DSSetToonTableRange3b(0,31,24,0,0,0);
+	DSSetToonTableRange3b(12,31,31,0,0,0);
+	//DSSetToonTableRange3b(24,31,31,4,4,0);
+	//DSSetToonTableRange3b(28,31,31,8,8,0);
 
 	DSMatrixMode(DS_PROJECTION);
 	DSLoadIdentity();
 	DSPerspectivef(65,256.0/192.0,0.1,16);
 
-	DSSetFogLinearf(0,0,0,31,1,10,0.1,16);
+	DSSetFogLinearf(0,0,0,31,6,10,0.1,16);
 
 	MakeParts();
 
 	for(int i=0;i<NumHearts;i++)
 	{
-		hearts[i].x=Random()%F(2)-F(1);
-		hearts[i].y=Random()%F(2)-F(1);
-		hearts[i].z=-F(16)*i/NumHearts;
+		PlaceHeart(&hearts[i]);
+		hearts[i].z=-F(10)*i/NumHearts;
 	}
 }
 
@@ -233,10 +243,15 @@ void RunHeartField(int t)
 	DSMatrixMode(DS_PROJECTION);
 	DSPushMatrix();
 
-/*	ivec3_t forward=ivec3norm(ivec3(dx,dy,F(1)));
+	int dx=7*isin(b*3-NumHearts*2*3);
+	int dy=7*icos(b*3-NumHearts*2*3);
+
+	ivec3_t forward=ivec3norm(ivec3(dy,-dx,F(6)));
 	ivec3_t side=ivec3norm(ivec3cross(ivec3(0,F(1),0),forward));
 	ivec3_t up=ivec3cross(forward,side);
-	DSMultMatrix3x3(imat3x3vec3(side,up,forward));*/
+	DSMultMatrix3x3(imat3x3vec3(side,up,forward));
+
+	DSTranslatef32(-dx,-dy,0);
 
 	DSMatrixMode(DS_POSITION_AND_VECTOR);
 	DSLoadIdentity();
@@ -245,8 +260,12 @@ void RunHeartField(int t)
 	{
 		DSLoadIdentity();
 		DSTranslatef32(hearts[i].x,hearts[i].y,hearts[i].z);
-		DSScalef(0.3,0.3,0.3);
-		DSRotateYi(F(1)*i/NumHearts);
+
+		int32_t scale=isin(F(1)*i/NumHearts-t*24);
+		scale=scale/5+F(0.4);
+
+		DSScalef32(scale,scale,scale);
+		DSRotateYi(F(1)*i/NumHearts+t*0x10);
 
 		int id=((-hearts[i].z)>>10)&0x3f;
 
@@ -256,7 +275,11 @@ void RunHeartField(int t)
 		DSCallList(heartlist);
 
 		hearts[i].z+=F(0.1);
-		if(hearts[i].z>0) hearts[i].z-=F(16);
+		if(hearts[i].z>=0)
+		{
+			PlaceHeart(&hearts[i]);
+			hearts[i].z-=F(10);
+		}
 	}
 
 	DSMatrixMode(DS_PROJECTION);
