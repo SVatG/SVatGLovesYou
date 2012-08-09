@@ -102,7 +102,7 @@ int offx = 0;
 int offy = 0;
 void voxelSpiral(int t) {
 
-	BG3_CY = t*512*2;
+	BG3_CY = t*512*4;
 	
 	// Kludge
 	static int lt = 0;
