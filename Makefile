@@ -148,7 +148,9 @@ BITMAPS = gfx/svatgst_indexed.bin \
 	gfx/ribbon_zero_left_1.bin \
 	gfx/ribbon_zero_up_1.bin \
 	gfx/ribbon_heart.bin \
-	gfx/ribbon_frame.bin
+	gfx/ribbon_frame.bin \
+	gfx/tunnel_frame.bin \
+	gfx/stripe_bg_hori.bin
 
 	  
 # Compiler setup

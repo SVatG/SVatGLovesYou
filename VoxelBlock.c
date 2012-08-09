@@ -163,7 +163,7 @@ void DrawVoxelBlock(VoxelBlock *self)
 	DSScalef32(DSf32(4096),DSf32(4096),DSf32(4096));
 
 	DISP3DCNT|=DS_OUTLINE;
-	DSPolygonAttributes(DS_POLY_MODE_MODULATION|DS_POLY_CULL_NONE|DS_POLY_LIGHT0|DS_POLY_ALPHA(31));
+	DSPolygonAttributes(DS_POLY_MODE_MODULATION|DS_POLY_CULL_NONE|DS_POLY_LIGHT0|DS_POLY_FOG|DS_POLY_ALPHA(31));
 	DSLight(0,0xffff,0x200);
 
 	DSBegin(DS_QUADS);
@@ -210,6 +210,13 @@ void DrawVoxelBlock(VoxelBlock *self)
 				DSNormal(light_z_pos);
 				DrawFace(voxel->patterns[5],x,y,z+1,1,0,0,0,1,0);
 			}
+		}
+
+		// Massive kludge
+		if(z == 25) {
+			DSEnd();
+			DSPolygonAttributes(DS_POLY_MODE_MODULATION|DS_POLY_CULL_NONE|DS_POLY_LIGHT0|DS_POLY_ALPHA(31));
+			DSBegin(DS_QUADS);	
 		}
 
 		voxel++;
