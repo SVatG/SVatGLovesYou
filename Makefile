@@ -10,6 +10,7 @@ OBJS = Main.o ARM.o \
        BoxBlock.o \
        RainbowTable.o \
        Field.o \
+       HeartField.o \
        DS3D/DS3D.o \
        DS3D/Utils.o \
        DS3D/Vector/VectorFixed.o \

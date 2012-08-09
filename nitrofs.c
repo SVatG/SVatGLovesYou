@@ -388,7 +388,7 @@ int nitroFSChdir(struct _reent *r,const char *name) {
 
 bool NDSFilePathScanner(char *path, char *end, void *buffer, struct stat st)
 {
-	DIR_ITER *dir=diropen(path);
+/*	DIR_ITER *dir=diropen(path);
 	if(!dir) return false;
  
 	while(dirnext(dir,end,&st)==0)
@@ -429,7 +429,7 @@ bool NDSFilePathScanner(char *path, char *end, void *buffer, struct stat st)
 		}
 	}
 	dirclose(dir);
-	return false;
+	return false;*/return true;
 }
  
 #define FATPATH "fat:/"
