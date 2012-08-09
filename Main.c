@@ -18,6 +18,7 @@
 // Effects!
 #include "effects.h"
 #include "Field.h"
+#include "HeartField.h"
 #include "ARM.h"
 
 // Sound!
@@ -82,8 +83,9 @@ int main()
 	#define EFFECT_DEBUG
 	#ifdef EFFECT_DEBUG
 	effect0_init();
-	effect3_init();
+//	effect3_init();
 // 	InitField();	
+	InitHeartField();
 	metaballs_precompute();
 	#else
 	metaballs_precompute();	
@@ -104,7 +106,8 @@ int main()
 
 		#ifdef EFFECT_DEBUG
 		effect0_update(t);
-		effect3_update(t);
+ 		RunHeartField(t);
+//		effect3_update(t);
 // 		RunField(t);
 // 		metaballs_update(t);
 		if( t == 16*20+30 ) {
