@@ -606,7 +606,7 @@ u8 effect3_update( u32 t ) {
 	uint16_t* palram = PALRAM_OBJ_A;
 	for(int p = 0; p < 32; p++) {
 		int ps = (p-t)%32;
-		palram[p+4] = MakeRGB15(abs(ps-16)+10,2,2);
+		palram[p+4] = MakeRGB15(abs(ps-16)+10,8,8);
 	}
 	
 	update_ribbons();

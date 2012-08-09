@@ -7,6 +7,7 @@ OBJS = Main.o ARM.o \
        nitrofs.o \
        Loader.o \
        VoxelBlock.o \
+       BoxBlock.o \
        RainbowTable.o \
        Field.o \
        DS3D/DS3D.o \
@@ -17,8 +18,9 @@ OBJS = Main.o ARM.o \
        metaballs.o \
        effect1.o \
        effect2.o \
-       effect3.o 
- 
+       effect3.o \
+       effect6.o
+	
 OBJS7 = Main.arm7.o
 
 #DEVKITPRO=../devkit/devkitPro

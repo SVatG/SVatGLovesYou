@@ -55,8 +55,24 @@ void fadein(int t, int b) {
 
 
 // EFFECTS:
+
+// Sub:
 // 0: Subscreen whopper. PERMAUSES VRAM C don't use that.
-// Metaballs: Metaballs.
+
+// Main:
+// Metaballs: Metaballs
+// 1: ECG
+// 2: Greets
+// 3: Ribbons
+// Field: Raymarching
+
+// TODO:
+// Starfield?
+// Tunnel?
+// Vectorballs?
+
+// Intro effect with title (and names?)
+// Outro effect with "loves you / vote for us damnit"
 
 int main()
 {
@@ -82,8 +98,8 @@ int main()
 	#define EFFECT_DEBUG
 	#ifdef EFFECT_DEBUG
 	effect0_init();
-	effect3_init();
-// 	InitField();	
+	effect6_init();
+// 	InitField();
 	metaballs_precompute();
 	#else
 	metaballs_precompute();	
@@ -104,7 +120,7 @@ int main()
 
 		#ifdef EFFECT_DEBUG
 		effect0_update(t);
-		effect3_update(t);
+		effect6_update(t);
 // 		RunField(t);
 // 		metaballs_update(t);
 		if( t == 16*20+30 ) {
@@ -113,7 +129,7 @@ int main()
 		#else
 
 		effect0_update(t);
-		if( t < 1000*60 ) {
+		if( t < 10*60 ) {
 			effect1_update(t);
 		}
 		else if(t < 20*60) {
