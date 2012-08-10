@@ -5,6 +5,7 @@
 #include "effect1.h"
 #include "effect2.h"
 #include "effect3.h"
+#include "effect4.h"
 #include "effect6.h"
 #include "metaballs.h"
 

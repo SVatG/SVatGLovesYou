@@ -4,11 +4,9 @@
 #include "RainbowTable.h"
 #include "Loader.h"
 
-u16* unicorna;
-int showmode = 0;
 void effect4_init() {
 
-	DISPCNT_A = DISPCNT_MODE_5 | DISPCNT_BG3_ON | DISPCNT_OBJ_ON | DISPCNT_ON;
+	DISPCNT_A = DISPCNT_MODE_5 | DISPCNT_BG3_ON | DISPCNT_ON;
 	VRAMCNT_D = VRAMCNT_D_BG_VRAM_A_OFFS_128K;
 	VRAMCNT_B = VRAMCNT_B_BG_VRAM_A_OFFS_0K;
 
@@ -20,75 +18,49 @@ void effect4_init() {
 	BG3PD_A = (1 << 8);
 	BG3X_A = 0;
 	BG3Y_A = 0;
-
-	if( showmode == 1 ) {
-		loadImage( "nitro:/gfx/eis.img.bin", VRAM_A_OFFS_0K,256*192*2);
-		loadVRAMIndirect( "nitro:/gfx/eis.img.bin", VRAM_A_OFFS_128K,256*192*2);
-
-		VRAMCNT_A = VRAMCNT_A_OBJ_VRAM_A;
-
-		oamInit(&oamMain, SpriteMapping_1D_128, false);
-		loadVRAMIndirect("nitro:/gfx/unicorn.pal.bin", SPRITE_PALETTE, 512);
-		unicorna = loadSpriteA( "nitro:/gfx/unicorn.img.bin" );
-	}
-	else {
-		loadImage( "nitro:/gfx/kirsche.img.bin", VRAM_A_OFFS_0K,256*192*2);
-		loadVRAMIndirect( "nitro:/gfx/kirsche.img.bin", VRAM_A_OFFS_128K,256*192*2);
-
-		VRAMCNT_A = VRAMCNT_A_OBJ_VRAM_A;
-
-		oamInit(&oamMain, SpriteMapping_1D_128, false);
-		loadVRAMIndirect("nitro:/gfx/unicorn.pal.bin", SPRITE_PALETTE, 512);
-		unicorna = loadSpriteA( "nitro:/gfx/unicorn.img.bin" );
-	}
 }
 
 u8 effect4_update( u32 t ) {
-	int swoop = (t<<13)/50;
-	if( showmode == 1 ) {
-		oamSet(
-			&oamMain, 1,
-			120, 25,
-			1, 0,
-			SpriteSize_64x64,
-			SpriteColorFormat_256Color,
-			unicorna,
-			1, true, false, false, false, false
-		);
 
-		oamRotateScale(
-			&oamMain,
-			1,
-			isin(swoop)>>3,
-			165-(isin(swoop)>>7),
-			165-(isin(swoop)>>7)
-		);
-	}
-	else {
-		oamSet(
-			&oamMain, 1,
-			10, 25,
-			1, 0,
-			SpriteSize_64x64,
-			SpriteColorFormat_256Color,
-			unicorna,
-			1, true, false, false, false, false
-		);
-
-		oamRotateScale(
-			&oamMain,
-			1,
-			isin(swoop)>>3,
-			-165+(isin(swoop)>>7),
-			165-(isin(swoop)>>7)
-		);
-	}
-	oamUpdate(&oamMain);
+	u16* screen = VRAM_A_OFFS_0K;
+	int32_t x1 = 60 + (isin(t<<3)>>7);
+	int32_t y1 = 30 + (icos((t+123)<<4)>>6);
+	int32_t x2 = 220 + (icos((t+12)<<4)>>6);
+	int32_t y2 = 180 + (isin(t<<4)>>5);
 	
+	int32_t d1 = 0;
+	int32_t d2 = 0;
+	int32_t dy1 = 0;
+	int32_t dy2 = 0;
+	int32_t dx1 = 0;
+	int32_t dx2 = 0;
+
+	
+	
+	for(int y = 0; y < 192; y++) {
+		dy1 = (y-y1);
+		dy1 = dy1*dy1;
+		dy2 = (y-y2);
+		dy2 = dy2*dy2;
+		for(int x = 0; x < 256; x++) {
+			dx1 = (x-x1);
+			dx1 = dx1*dx1;
+			dx2 = (x-x2);
+			dx2 = dx2*dx2;
+			d1 = ((dx1+dy1)>>12) & 1;
+			d2 = ((dx2+dy2)>>12) & 1;
+			if((d1^d2) == 1) {
+				screen[x+y*256] = MakeRGB15(27,10,10);
+			}
+			else {
+				screen[x+y*256] = MakeRGB15(28,28,28);
+			}
+		}
+	}
 	return( 0 );
 }
 
 
 void effect4_destroy() {
-	irqDisable( IRQ_HBLANK );
+	
 }

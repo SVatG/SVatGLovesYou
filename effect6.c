@@ -42,9 +42,13 @@ void effect6_init() {
 	BLDALPHA_A = BLDALPHA_EVA(8)|BLDALPHA_EVB(15);
 
 	// BG and frame
+	VRAMCNT_D = VRAMCNT_D_LCDC;
 	VRAMCNT_B = VRAMCNT_B_BG_VRAM_A_OFFS_0K;
 	VRAMCNT_A = VRAMCNT_A_BG_VRAM_A_OFFS_128K;
 
+	loadImageVRAMIndirectGreen( "nitro:/gfx/tunnel_frame.img.bin", VRAM_A_OFFS_0K,256*256*2);
+	loadImageVRAMIndirectGreen( "nitro:/gfx/stripe_bg_hori.img.bin", VRAM_A_OFFS_128K,256*256*2);
+	
 	BG2CNT_A = BGxCNT_EXTENDED_BITMAP_16 | BGxCNT_OVERFLOW_WRAP | BGxCNT_BITMAP_SIZE_256x256 | BGxCNT_BITMAP_BASE_0K;
 	BG2CNT_A = (BG2CNT_A&~BGxCNT_PRIORITY_MASK)|BGxCNT_PRIORITY_0;
 	BG2_XDX = (1 << 8);
@@ -65,9 +69,6 @@ void effect6_init() {
 	BG3_YDY = (1 << 8);
 	BG3_CX = 0;
 	BG3_CY = 0;
-
-	loadImageVRAMIndirectGreen( "nitro:/gfx/tunnel_frame.img.bin", VRAM_A_OFFS_0K,256*256*2);
-	loadImage( "nitro:/gfx/stripe_bg_hori.img.bin", VRAM_A_OFFS_128K,256*256*2);
 	
 	// Set up voxelcubes
 	VRAMCNT_D=VRAMCNT_D_LCDC;

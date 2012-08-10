@@ -134,7 +134,7 @@ void drawbars(int t) {
 		if(brightness != 0) {
 			int rb = (brightness * 7)/9 > 31 ? 31 : (brightness*7)/9;
 			int g = (brightness * 12)/9 > 31 ? 31 : (brightness*12)/9;
-			bg[x] = MakeRGB15(rb,g,rb);
+			bg[x] = MakeRGB15(g,rb,rb);
 		}
 		else {
 			bg[x] = ~BIT(15);

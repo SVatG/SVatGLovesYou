@@ -20,7 +20,8 @@ OBJS = Main.o ARM.o \
        effect1.o \
        effect2.o \
        effect3.o \
-       effect6.o
+       effect6.o \
+       effect4.o
 	
 OBJS7 = Main.arm7.o
 

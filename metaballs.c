@@ -35,12 +35,15 @@ static inline s32 metaball( s32 x, s32 y, s32 z, s32 cx, s32 cy, s32 cz ) {
 	return( divf32( 1<<12, rsq ) );
 }
 
+
+#define PREGRID(x,y,z) pre_grid[30*30*z+30*y+x]
+
 // Nice precalculated grid for the balls.
 // BROKEN PRECELL *pre_grid = (s8*)(0x027C0000 + 256 * sizeof( s16 ) + 256 * 16 * sizeof(u8));
-PRECELL pre_grid[30][30][30];
+PRECELL* pre_grid;
 
 // Dead polygon storage
-TRIANGLE triangles[1200];
+TRIANGLE* triangles;
 
 // Get a single grid cell by looking up shit in the precalc'd table
 static inline void cell_at( GRIDCELL* b, s32 x, s32 y, s32 z, s32 cx, s32 cy, s32 cz, u8 inf ) {
@@ -52,8 +55,8 @@ static inline void cell_at( GRIDCELL* b, s32 x, s32 y, s32 z, s32 cx, s32 cy, s3
 	accy = abs( y - cy );
 	accz = abs( z - cz );
 
-	memcpy( &b->p, &pre_grid[ x ][ y ][ z ].p[ 0 ], 8 * sizeof( XYZ ) );
-	memcpy( &b->val, &pre_grid[ accx ][ accy ][ accz ].val[ 0 ], 8 * sizeof( u16 ) );
+	memcpy( &b->p, &PREGRID(x,y,z).p[ 0 ], 8 * sizeof( XYZ ) );
+	memcpy( &b->val, &PREGRID( accx, accy, accz ).val[ 0 ], 8 * sizeof( u16 ) );
 	if( (x - cx) < 0 ) {
 		SWITCH( b->val[ 0 ],  b->val[ 1 ] );
 		SWITCH( b->val[ 4 ],  b->val[ 5 ] );
@@ -86,7 +89,7 @@ static inline void cell_add( GRIDCELL* b, s32 x, s32 y, s32 z, s32 cx, s32 cy, s
 	s16 accy = abs( y - cy );
 	s16 accz = abs( z - cz );
 
-	memcpy( &c.val, &pre_grid[ accx ][ accy ][ accz ].val[ 0 ], 8 * sizeof( u16 ) );
+	memcpy( &c.val, &PREGRID( accx, accy, accz ).val[ 0 ], 8 * sizeof( u16 ) );
 	if( (x - cx) < 0 ) {
 		SWITCH( c.val[ 0 ],  c.val[ 1 ] );
 		SWITCH( c.val[ 4 ],  c.val[ 5 ] );
@@ -113,6 +116,8 @@ static inline void cell_add( GRIDCELL* b, s32 x, s32 y, s32 z, s32 cx, s32 cy, s
 }
 
 void metaballs_precompute() {
+	pre_grid = malloc(30*30*30*sizeof(PRECELL));
+	
 	// Set up vertex position change variables.
 	u32 cell_width = divf32( (2 << 10)*3, 20 << 12 );
 	u32 cell_size = mulf32( cell_width, 2 << 12 );
@@ -126,43 +131,43 @@ void metaballs_precompute() {
 		for( int y = 0; y < 30; y++ ) {
 			tz = 0;
 			for( int z = 0; z < 30; z++ ) {
-				pre_grid[ x ][ y ][ z ].p[ 0 ].x = tx - cell_width;
-				pre_grid[ x ][ y ][ z ].p[ 0 ].y = ty - cell_width;
-				pre_grid[ x ][ y ][ z ].p[ 0 ].z = tz + cell_width;
+				PREGRID(x,y,z).p[ 0 ].x = tx - cell_width;
+				PREGRID(x,y,z).p[ 0 ].y = ty - cell_width;
+				PREGRID(x,y,z).p[ 0 ].z = tz + cell_width;
 
-				pre_grid[ x ][ y ][ z ].p[ 1 ].x = tx + cell_width;
-				pre_grid[ x ][ y ][ z ].p[ 1 ].y = ty - cell_width;
-				pre_grid[ x ][ y ][ z ].p[ 1 ].z = tz + cell_width;
+				PREGRID(x,y,z).p[ 1 ].x = tx + cell_width;
+				PREGRID(x,y,z).p[ 1 ].y = ty - cell_width;
+				PREGRID(x,y,z).p[ 1 ].z = tz + cell_width;
 
-				pre_grid[ x ][ y ][ z ].p[ 2 ].x = tx + cell_width;
-				pre_grid[ x ][ y ][ z ].p[ 2 ].y = ty - cell_width;
-				pre_grid[ x ][ y ][ z ].p[ 2 ].z = tz - cell_width;
+				PREGRID(x,y,z).p[ 2 ].x = tx + cell_width;
+				PREGRID(x,y,z).p[ 2 ].y = ty - cell_width;
+				PREGRID(x,y,z).p[ 2 ].z = tz - cell_width;
 
-				pre_grid[ x ][ y ][ z ].p[ 3 ].x = tx - cell_width;
-				pre_grid[ x ][ y ][ z ].p[ 3 ].y = ty - cell_width;
-				pre_grid[ x ][ y ][ z ].p[ 3 ].z = tz - cell_width;
+				PREGRID(x,y,z).p[ 3 ].x = tx - cell_width;
+				PREGRID(x,y,z).p[ 3 ].y = ty - cell_width;
+				PREGRID(x,y,z).p[ 3 ].z = tz - cell_width;
 
-				pre_grid[ x ][ y ][ z ].p[ 4 ].x = tx - cell_width;
-				pre_grid[ x ][ y ][ z ].p[ 4 ].y = ty + cell_width;
-				pre_grid[ x ][ y ][ z ].p[ 4 ].z = tz + cell_width;
+				PREGRID(x,y,z).p[ 4 ].x = tx - cell_width;
+				PREGRID(x,y,z).p[ 4 ].y = ty + cell_width;
+				PREGRID(x,y,z).p[ 4 ].z = tz + cell_width;
 
-				pre_grid[ x ][ y ][ z ].p[ 5 ].x = tx + cell_width;
-				pre_grid[ x ][ y ][ z ].p[ 5 ].y = ty + cell_width;
-				pre_grid[ x ][ y ][ z ].p[ 5 ].z = tz + cell_width;
+				PREGRID(x,y,z).p[ 5 ].x = tx + cell_width;
+				PREGRID(x,y,z).p[ 5 ].y = ty + cell_width;
+				PREGRID(x,y,z).p[ 5 ].z = tz + cell_width;
 
-				pre_grid[ x ][ y ][ z ].p[ 6 ].x = tx + cell_width;
-				pre_grid[ x ][ y ][ z ].p[ 6 ].y = ty + cell_width;
-				pre_grid[ x ][ y ][ z ].p[ 6 ].z = tz - cell_width;
+				PREGRID(x,y,z).p[ 6 ].x = tx + cell_width;
+				PREGRID(x,y,z).p[ 6 ].y = ty + cell_width;
+				PREGRID(x,y,z).p[ 6 ].z = tz - cell_width;
 
-				pre_grid[ x ][ y ][ z ].p[ 7 ].x = tx - cell_width;
-				pre_grid[ x ][ y ][ z ].p[ 7 ].y = ty + cell_width;
-				pre_grid[ x ][ y ][ z ].p[ 7 ].z = tz - cell_width;
+				PREGRID(x,y,z).p[ 7 ].x = tx - cell_width;
+				PREGRID(x,y,z).p[ 7 ].y = ty + cell_width;
+				PREGRID(x,y,z).p[ 7 ].z = tz - cell_width;
 
 				for( int i = 0; i < 8; i++ ) {
-					pre_grid[ x ][ y ][ z ].val[ i ] = metaball(
-						pre_grid[ x ][ y ][ z ].p[ i ].x,
-						pre_grid[ x ][ y ][ z ].p[ i ].y,
-						pre_grid[ x ][ y ][ z ].p[ i ].z,
+					PREGRID(x,y,z).val[ i ] = metaball(
+						PREGRID(x,y,z).p[ i ].x,
+						PREGRID(x,y,z).p[ i ].y,
+						PREGRID(x,y,z).p[ i ].z,
 					0, 0, 0);
 				}
 
@@ -219,6 +224,8 @@ void metaballs_init() {
 	glMaterialf( GL_EMISSION, RGB15( 0, 0, 0 ) );
 
 	DSPolygonAttributes(DS_POLY_CULL_NONE|DS_POLY_LIGHT0|DS_POLY_ALPHA(0)|DS_POLY_MODE_MODULATION);
+
+	triangles = malloc(sizeof(TRIANGLE)*1200);
 	
 // 	copyTables();
 }
@@ -364,7 +371,12 @@ void metaballs_update(s32 t) {
 	DSBegin( DS_TRIANGLES );
 	for( u16 i = 0; i < tri_count; i++ ) {
 		for( s8 j = 0; j < 3; j++ ) {
-			DSColor3b( triangles[ i ].p[ j ].inf[0]>>9, triangles[ i ].p[ j ].inf[1]>>9, 22 );
+			DSColor3b(
+				(triangles[ i ].p[ j ].inf[0]*29 + triangles[ i ].p[ j ].inf[1]*30 + triangles[ i ].p[ j ].inf[2]*2)>>14,
+				(triangles[ i ].p[ j ].inf[0]*29 + triangles[ i ].p[ j ].inf[1]*18 + triangles[ i ].p[ j ].inf[2]*2)>>14,
+				(triangles[ i ].p[ j ].inf[0]*29 + triangles[ i ].p[ j ].inf[1]*18 + triangles[ i ].p[ j ].inf[2]*2)>>14
+
+			);
 			DSVertex3v16( triangles[ i ].p[ j ].x, triangles[ i ].p[ j ].y, triangles[ i ].p[ j ].z );
 		}
 	}
@@ -376,4 +388,6 @@ void metaballs_update(s32 t) {
 void metaballs_destroy() {
 	BLDCNT_A = 0;
 	BLDALPHA_A = 0;
+	free(triangles);
+	free(pre_grid);
 }

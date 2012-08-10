@@ -10,7 +10,7 @@
 #define Height 96
 
 static int frame;
-static int16_t rayarray[Width*Height*3];
+static int16_t* rayarray;
 
 void InitField()
 {
@@ -31,6 +31,7 @@ void InitField()
 
 	frame=0;
 
+	rayarray = malloc(sizeof(int16_t)*Width*Height*3);
 	int16_t *rays=rayarray;
 
 	for(int y=0;y<Height;y++)
@@ -51,6 +52,7 @@ void InitField()
 
 void StopField()
 {
+	free(rayarray);
 }
 
 void RunField(int t)
@@ -71,10 +73,10 @@ void RunField(int t)
 	frame^=1;
 
 	for(int i=0;i<12;i++)
-	PALRAM_A[i]=0x8000|MakeHSV(210,Fix(1),Fix(i)/12);
+	PALRAM_A[i]=0x8000|MakeHSV(0,Fix(0.8),Fix(i)/12);
 
 	for(int i=0;i<12;i++)
-	PALRAM_A[i+12]=0x8000|MakeHSV(210,Fix(11-i)/12,Fix(1));
+	PALRAM_A[i+12]=0x8000|MakeHSV(0,Fix(11-i)/16,Fix(1));
 
 	RenderFieldARM(t,vram,rayarray);
 }

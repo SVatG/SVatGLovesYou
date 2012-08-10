@@ -8,13 +8,6 @@
 static int flip;
 static uint32_t whitetexture;
 
-uint8_t colpos = 0;
-void hblank() {
-	dmaCopyHalfWords( 0, &rainbowTable[colpos], PALRAM_A+4, 2 );
-	colpos++;
-}
-
-
 int greet_id;
 
 char* greet_images[5] = {

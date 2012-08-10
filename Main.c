@@ -30,8 +30,6 @@ static void vblank();
 
 extern int tempImage;
 
-uint8_t ATTR_DTCM dtcm_buffer[12288];
-
 void fadeout(int t, int b) {
 	uint16_t* love_coloured_master_bright = (uint16_t*)(0x400006C);
 	if( t > b-16 ) {
@@ -96,34 +94,35 @@ int main()
 	t = 0;
 
 	// Main loop
-	#define EFFECT_DEBUG
+// 	#define EFFECT_DEBUG
 	#ifdef EFFECT_DEBUG
 	effect0_init();
-	effect6_init();
-// 	InitField();
+// 	effect4_init();
+	InitField();
 // 	InitHeartField();
 	metaballs_precompute();
 	#else
 	metaballs_precompute();	
 	effect0_init();
-	effect1_init();
+	InitField();
 	#endif
 	
 	uint8_t *wram=(uint8_t *)0x3000000;
 //	memset(wram,0,128*96);
 
 	mmInitDefault( "nitro:/zik/music.bin" );
-	mmLoad( MOD_RAINBOWS_CLN );
-	mmStart( MOD_RAINBOWS_CLN, MM_PLAY_ONCE );
+	mmLoad( MOD_WIENERLONG );
+	mmStart( MOD_WIENERLONG, MM_PLAY_ONCE );
 	effect0_change(0);
 
 	int next_effect_init = 0;
-	while( t<140*60 ) {
+	while( 1 ) {
 
+		#define DUR 60
 		#ifdef EFFECT_DEBUG
 		effect0_update(t);
 //  		RunHeartField(t);
-		effect6_update(t);
+		effect4_update(t);
 // 		RunField(t);
 // 		metaballs_update(t);
 		if( t == 16*20+30 ) {
@@ -132,24 +131,67 @@ int main()
 		#else
 
 		effect0_update(t);
-		if( t < 10*60 ) {
-			effect1_update(t);
+		if( t < 10*DUR ) {
+			RunField(t);
 		}
-		else if(t < 20*60) {
+		else if(t < 20*DUR) {
 			if(next_effect_init < 1) {
 				next_effect_init++;
-				effect1_destroy();
+				StopField();
 				metaballs_init();
 			}
 			metaballs_update(t);
 		}
-		else {
+		else if(t < 30*DUR) {
 			if(next_effect_init < 2) {
 				next_effect_init++;
 				metaballs_destroy();
 				effect2_init();
 			}
 			effect2_update(t);
+		}
+		else if(t < 40*DUR) {
+			if(next_effect_init < 3) {
+				next_effect_init++;
+				effect2_destroy();
+				effect3_init();
+			}
+			effect3_update(t);
+		}
+		else if(t < 50*DUR) {
+			if(next_effect_init < 4) {
+				next_effect_init++;
+				effect3_destroy();
+				effect1_init();
+			}
+			effect1_update(t);
+		}
+		else if(t < 60*DUR) {
+			if(next_effect_init < 5) {
+				next_effect_init++;
+				effect1_destroy();
+				effect4_init();
+			}
+			effect4_update(t);
+		}
+		else if(t < 70*DUR) {
+			if(next_effect_init < 6) {
+				next_effect_init++;
+				effect4_destroy();
+				effect6_init();
+			}
+			effect6_update(t);
+		}
+		else if(t < 80*DUR) {
+			if(next_effect_init < 7) {
+				next_effect_init++;
+				effect6_destroy();
+				InitHeartField();
+			}
+			RunHeartField(t);
+		}
+		else {
+
 		}
 		#endif
 		

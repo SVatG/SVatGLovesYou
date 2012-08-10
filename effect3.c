@@ -28,7 +28,7 @@ typedef struct ribbon_tile {
 } ribbon_tile;
 
 typedef struct ribbon {
-	ribbon_tile tiles[MAX_SEGMENTS];
+	ribbon_tile* tiles;
 	int tile_count;
 	int head_status;
 	int head_tile;
@@ -46,7 +46,7 @@ typedef struct row_tile {
 	int prio;
 } row_tile;
 
-row_tile row_tiles[12][MAX_PERROW];
+row_tile* row_tiles[12];
 int row_tile_counts[12];
 
 void switchSprites() {
@@ -272,6 +272,14 @@ void loadSprites() {
 }
 
 void effect3_init() {
+
+	for(int i = 0; i < 12; i++) {
+		row_tiles[i] = malloc(sizeof(row_tile)*MAX_PERROW);
+	}
+
+	for(int i = 0; i < RIBBON_COUNT; i++) {
+		ribbons[i].tiles = malloc(MAX_SEGMENTS * sizeof(ribbon_tile));
+	}
 	
 	DISPCNT_A = DISPCNT_MODE_5 | DISPCNT_OBJ_ON | DISPCNT_BG2_ON | DISPCNT_BG3_ON | DISPCNT_ON;
 
@@ -497,109 +505,109 @@ void ribbons_to_rowribbons() {
 	}
 }
 
-void rowribbon_test() {
-	int sprite_cnt = 0;
-	for(int row = 0; row < 12; row++) {
-		for(int i = 0; i < row_tile_counts[row]; i++) {
-			oamSet(
-				&oamMain, RIBBON_COUNT + sprite_cnt++,
-				row_tiles[row][i].x,row_tiles[row][i].y,
-				row_tiles[row][i].prio, 0,
-				SpriteSize_16x16,
-				SpriteColorFormat_256Color,
-				row_tiles[row][i].sprite,
-				32, false, false, false, false, false
-			);
-		}
-	}
-	oamUpdate(&oamMain);
-}
-
-void draw_ribbons_direct() {
-	int sprite_cnt = 0;
-	for(int ribbon_cnt = 0; ribbon_cnt < RIBBON_COUNT; ribbon_cnt++) {
-		// Newest
-		u16* newestSprite = ribbonSprite[
-			ribbons[ribbon_cnt].tiles[ribbons[ribbon_cnt].tile_count-1].from
-		][
-			ribbons[ribbon_cnt].tiles[ribbons[ribbon_cnt].tile_count-1].to
-		][ribbons[ribbon_cnt].tiles[ribbons[ribbon_cnt].tile_count-1].tile];
-		if(ribbons[ribbon_cnt].head_status == 0) {
-			int old_head;
-			if(ribbons[ribbon_cnt].tiles[ribbons[ribbon_cnt].tile_count-1].from == DIR_RIGHT) {
-				old_head = DIR_LEFT;
-			}
-			if(ribbons[ribbon_cnt].tiles[ribbons[ribbon_cnt].tile_count-1].from == DIR_LEFT) {
-				old_head = DIR_RIGHT;
-			}
-			if(ribbons[ribbon_cnt].tiles[ribbons[ribbon_cnt].tile_count-1].from == DIR_DOWN) {
-				old_head = DIR_UP;
-			}
-			if(ribbons[ribbon_cnt].tiles[ribbons[ribbon_cnt].tile_count-1].from == DIR_UP) {
-				old_head = DIR_DOWN;
-			}
-			newestSprite = ribbonSprite[old_head][old_head][ribbons[ribbon_cnt].tiles[ribbons[ribbon_cnt].tile_count-1].tile];
-		}
-
-		oamSet(
-			&oamMain, sprite_cnt,
-			ribbons[ribbon_cnt].tiles[ribbons[ribbon_cnt].tile_count-1].x*16,
-			ribbons[ribbon_cnt].tiles[ribbons[ribbon_cnt].tile_count-1].y*16,
-			1, 0,
-			SpriteSize_16x16,
-			SpriteColorFormat_256Color,
-			newestSprite,
-			32, false, false, false, false, false
-		);
-		sprite_cnt++;
-
-		// Head
-		int head_xd = 0;
-		int head_yd = 0;
-		if(ribbons[ribbon_cnt].head_dir == DIR_RIGHT) {
-			head_xd = 2*ribbons[ribbon_cnt].head_status;
-		}
-		if(ribbons[ribbon_cnt].head_dir == DIR_LEFT) {
-			head_xd = -2*ribbons[ribbon_cnt].head_status;
-		}
-		if(ribbons[ribbon_cnt].head_dir == DIR_DOWN) {
-			head_yd = 2*ribbons[ribbon_cnt].head_status;
-		}
-		if(ribbons[ribbon_cnt].head_dir == DIR_UP) {
-			head_yd = -2*ribbons[ribbon_cnt].head_status;
-		}
-		oamSet(
-			&oamMain, sprite_cnt,
-			ribbons[ribbon_cnt].x*16+head_xd,ribbons[ribbon_cnt].y*16+head_yd,
-			ribbons[ribbon_cnt].head_status <= 1 ? 0 : 1, 0,
-			SpriteSize_16x16,
-			SpriteColorFormat_256Color,
-			ribbons[ribbon_cnt].head_status <= 1 ?
-				zeroSprite[ribbons[ribbon_cnt].head_dir] :
-				ribbonSprite[ribbons[ribbon_cnt].head_dir][ribbons[ribbon_cnt].head_dir][ribbons[ribbon_cnt].head_tile],
-			32, false, false, false, false, false
-		);
-		sprite_cnt++;
-
-		// All-but-newest
-		for(int tile_cnt = ribbons[ribbon_cnt].tile_count - 2; tile_cnt >= 0; tile_cnt-- ) {
-			oamSet(
-				&oamMain, sprite_cnt,
-				ribbons[ribbon_cnt].tiles[tile_cnt].x*16,ribbons[ribbon_cnt].tiles[tile_cnt].y*16,
-				1, 0,
-				SpriteSize_16x16,
-				SpriteColorFormat_256Color,
-				ribbonSprite[
-					ribbons[ribbon_cnt].tiles[tile_cnt].from][ribbons[ribbon_cnt].tiles[tile_cnt].to
-				][ribbons[ribbon_cnt].tiles[tile_cnt].tile],
-				32, false, false, false, false, false
-			);
-			sprite_cnt++;
-		}
-	}
-	
-	oamUpdate(&oamMain);
-}
+// void rowribbon_test() {
+// 	int sprite_cnt = 0;
+// 	for(int row = 0; row < 12; row++) {
+// 		for(int i = 0; i < row_tile_counts[row]; i++) {
+// 			oamSet(
+// 				&oamMain, RIBBON_COUNT + sprite_cnt++,
+// 				row_tiles[row][i].x,row_tiles[row][i].y,
+// 				row_tiles[row][i].prio, 0,
+// 				SpriteSize_16x16,
+// 				SpriteColorFormat_256Color,
+// 				row_tiles[row][i].sprite,
+// 				32, false, false, false, false, false
+// 			);
+// 		}
+// 	}
+// 	oamUpdate(&oamMain);
+// }
+// 
+// void draw_ribbons_direct() {
+// 	int sprite_cnt = 0;
+// 	for(int ribbon_cnt = 0; ribbon_cnt < RIBBON_COUNT; ribbon_cnt++) {
+// 		// Newest
+// 		u16* newestSprite = ribbonSprite[
+// 			ribbons[ribbon_cnt].tiles[ribbons[ribbon_cnt].tile_count-1].from
+// 		][
+// 			ribbons[ribbon_cnt].tiles[ribbons[ribbon_cnt].tile_count-1].to
+// 		][ribbons[ribbon_cnt].tiles[ribbons[ribbon_cnt].tile_count-1].tile];
+// 		if(ribbons[ribbon_cnt].head_status == 0) {
+// 			int old_head;
+// 			if(ribbons[ribbon_cnt].tiles[ribbons[ribbon_cnt].tile_count-1].from == DIR_RIGHT) {
+// 				old_head = DIR_LEFT;
+// 			}
+// 			if(ribbons[ribbon_cnt].tiles[ribbons[ribbon_cnt].tile_count-1].from == DIR_LEFT) {
+// 				old_head = DIR_RIGHT;
+// 			}
+// 			if(ribbons[ribbon_cnt].tiles[ribbons[ribbon_cnt].tile_count-1].from == DIR_DOWN) {
+// 				old_head = DIR_UP;
+// 			}
+// 			if(ribbons[ribbon_cnt].tiles[ribbons[ribbon_cnt].tile_count-1].from == DIR_UP) {
+// 				old_head = DIR_DOWN;
+// 			}
+// 			newestSprite = ribbonSprite[old_head][old_head][ribbons[ribbon_cnt].tiles[ribbons[ribbon_cnt].tile_count-1].tile];
+// 		}
+// 
+// 		oamSet(
+// 			&oamMain, sprite_cnt,
+// 			ribbons[ribbon_cnt].tiles[ribbons[ribbon_cnt].tile_count-1].x*16,
+// 			ribbons[ribbon_cnt].tiles[ribbons[ribbon_cnt].tile_count-1].y*16,
+// 			1, 0,
+// 			SpriteSize_16x16,
+// 			SpriteColorFormat_256Color,
+// 			newestSprite,
+// 			32, false, false, false, false, false
+// 		);
+// 		sprite_cnt++;
+// 
+// 		// Head
+// 		int head_xd = 0;
+// 		int head_yd = 0;
+// 		if(ribbons[ribbon_cnt].head_dir == DIR_RIGHT) {
+// 			head_xd = 2*ribbons[ribbon_cnt].head_status;
+// 		}
+// 		if(ribbons[ribbon_cnt].head_dir == DIR_LEFT) {
+// 			head_xd = -2*ribbons[ribbon_cnt].head_status;
+// 		}
+// 		if(ribbons[ribbon_cnt].head_dir == DIR_DOWN) {
+// 			head_yd = 2*ribbons[ribbon_cnt].head_status;
+// 		}
+// 		if(ribbons[ribbon_cnt].head_dir == DIR_UP) {
+// 			head_yd = -2*ribbons[ribbon_cnt].head_status;
+// 		}
+// 		oamSet(
+// 			&oamMain, sprite_cnt,
+// 			ribbons[ribbon_cnt].x*16+head_xd,ribbons[ribbon_cnt].y*16+head_yd,
+// 			ribbons[ribbon_cnt].head_status <= 1 ? 0 : 1, 0,
+// 			SpriteSize_16x16,
+// 			SpriteColorFormat_256Color,
+// 			ribbons[ribbon_cnt].head_status <= 1 ?
+// 				zeroSprite[ribbons[ribbon_cnt].head_dir] :
+// 				ribbonSprite[ribbons[ribbon_cnt].head_dir][ribbons[ribbon_cnt].head_dir][ribbons[ribbon_cnt].head_tile],
+// 			32, false, false, false, false, false
+// 		);
+// 		sprite_cnt++;
+// 
+// 		// All-but-newest
+// 		for(int tile_cnt = ribbons[ribbon_cnt].tile_count - 2; tile_cnt >= 0; tile_cnt-- ) {
+// 			oamSet(
+// 				&oamMain, sprite_cnt,
+// 				ribbons[ribbon_cnt].tiles[tile_cnt].x*16,ribbons[ribbon_cnt].tiles[tile_cnt].y*16,
+// 				1, 0,
+// 				SpriteSize_16x16,
+// 				SpriteColorFormat_256Color,
+// 				ribbonSprite[
+// 					ribbons[ribbon_cnt].tiles[tile_cnt].from][ribbons[ribbon_cnt].tiles[tile_cnt].to
+// 				][ribbons[ribbon_cnt].tiles[tile_cnt].tile],
+// 				32, false, false, false, false, false
+// 			);
+// 			sprite_cnt++;
+// 		}
+// 	}
+// 	
+// 	oamUpdate(&oamMain);
+// }
 
 u8 effect3_update( u32 t ) {
 
@@ -618,5 +626,19 @@ u8 effect3_update( u32 t ) {
 
 
 void effect3_destroy() {
+	for(int i = 0; i < 4; i++) {
+		oamFreeGfx(&oamMain,zeroSprite[i]);
+		for(int j = 0; j < 4; j++) {
+			for(int k = 0; k < 4; k++) {
+				oamFreeGfx(&oamMain,ribbonSprite[i][j][k]);
+			}
+		}
+	}
+	for(int i = 0; i < 12; i++) {
+		free(row_tiles[i]);
+	}
+	for(int i = 0; i < RIBBON_COUNT; i++) {
+		free(ribbons[i].tiles);
+	}
 	irqDisable( IRQ_HBLANK );
 }
