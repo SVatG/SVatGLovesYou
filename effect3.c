@@ -320,7 +320,7 @@ void effect3_init() {
 
 	vu16* mem_BLDCNT_A = (vu16*)(0x04000050);
 	*mem_BLDCNT_A = BLDCNT_SRC_A_OBJ | BLDCNT_SRC_B_BG3 | BLDCNT_EFFECT_ALPHA;
-	BLDALPHA_A = BLDALPHA_EVA(10)|BLDALPHA_EVB(6);
+	BLDALPHA_A = BLDALPHA_EVA(13)|BLDALPHA_EVB(2);
 	
 	// Palette
 	load8bVRAMIndirect("nitro:/gfx/ribbon_right_left_1.pal.bin", PALRAM_OBJ_A,256);
@@ -620,7 +620,7 @@ u8 effect3_update( u32 t ) {
 	uint16_t* palram = PALRAM_OBJ_A;
 	for(int p = 0; p < 32; p++) {
 		int ps = (p-t)%32;
-		palram[p+4] = MakeRGB15(abs(ps-16)+10,8,8);
+		palram[p+4] = MakeRGB15(abs(ps-16)+10,3,3);
 	}
 	
 	update_ribbons();

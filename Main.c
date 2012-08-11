@@ -42,7 +42,7 @@ extern int tempImage;
 // 		memset( love_coloured_master_bright, (1<<7) | val, 2 );
 // 	}
 // 	else if(t > b) {
-// 		memset( love_coloured_master_bright, (1<<7) | 15, 2 );
+// 		memset( love_coloured_master_bright, (1<<7) | 16, 2 );
 // 	}
 // }
 // 
@@ -74,7 +74,7 @@ void fadeinout(int t, int s, int e) {
 // 		memset( master_bright, (1<<7) | val, 2 );
 // 	}
 // 	else {
-// 		memset( master_bright, (1<<7) | 15, 2 );
+// 		memset( master_bright, (1<<7) | 16, 2 );
 // 	}
 	scur = s;
 	ecur = e;
@@ -131,8 +131,8 @@ int main()
 // 	#define EFFECT_DEBUG
 	#ifdef EFFECT_DEBUG
 	effect0_init();
-// 	effect4_init();
-	InitField();
+	effect1_init();
+// 	InitField();
 // 	InitHeartField();
 	metaballs_precompute();
 	#else
@@ -162,13 +162,13 @@ int main()
 
 		#define DUR (64.0 * 2.0 * (4.8))
 
-// 		#define DUR (60*3)
+// 		#define DUR (60*4)
 		
 		#ifdef EFFECT_DEBUG
-		effect0_update(t-toff);
+// 		effect0_update(t-toff);
 // //  		RunHeartField(t);
-// 		effect4_update(t);
-// // 		RunField(t);
+		effect1_update(t);
+// 		RunField(t);
 // // 		metaballs_update(t);
 // 		if( t == 16*20+30 ) {
 // 			effect0_change(1);
@@ -183,10 +183,11 @@ int main()
 			if(next_effect_init < 1) {
 				fadeinout(t-toff,2*DUR,3*DUR);
 				blockload = 1;
-				memset( master_bright, (1<<7) | 15, 2 );
+				memset( master_bright, (1<<7) | 16, 2 );
 				next_effect_init++;
 				// LATER TODO: Destroy intro
 				effect4_init();
+				effect4_update(t);
 				blockload = 0;
 			}
 			effect4_update(t);
@@ -196,9 +197,10 @@ int main()
 				fadeinout(t-toff,3*DUR,4*DUR);				
 				next_effect_init++;
 				blockload = 1;
-				memset( master_bright, (1<<7) | 15, 2 );
+				memset( master_bright, (1<<7) | 16, 2 );
 				effect4_destroy();
 				effect3_init();
+				effect3_update(t);
 				blockload = 0;
 			}
 			effect3_update(t);
@@ -208,7 +210,7 @@ int main()
 				fadeinout(t-toff,4*DUR,5*DUR);				
 				next_effect_init++;
 				blockload = 1;
-				memset( master_bright, (1<<7) | 15, 2 );
+				memset( master_bright, (1<<7) | 16, 2 );
 				effect3_destroy();
 				metaballs_init();
 				blockload = 0;
@@ -219,9 +221,10 @@ int main()
 			if(next_effect_init < 4) {
 				next_effect_init++;
 				blockload = 1;
-				memset( master_bright, (1<<7) | 15, 2 );
+				memset( master_bright, (1<<7) | 16, 2 );
 				metaballs_destroy();
 				InitHeartField();
+				RunHeartField(t);
 				blockload = 0;
 			}
 			RunHeartField(t);
@@ -231,9 +234,10 @@ int main()
 			if(next_effect_init < 5) {
 				next_effect_init++;
 				blockload = 1;
-				memset( master_bright, (1<<7) | 15, 2 );
+				memset( master_bright, (1<<7) | 16, 2 );
 				// No stop heart field.
 				effect2_init();
+				effect2_update(t);
 				blockload = 0;
 			}
 			effect2_update(t);
@@ -243,9 +247,10 @@ int main()
 			if(next_effect_init < 6) {
 				next_effect_init++;
 				blockload = 1;
-				memset( master_bright, (1<<7) | 15, 2 );
+				memset( master_bright, (1<<7) | 16, 2 );
 				effect2_destroy();
 				effect6_init();
+				effect6_update(t);
 				blockload = 0;
 			}
 			effect6_update(t);
@@ -255,9 +260,10 @@ int main()
 			if(next_effect_init < 7) {
 				next_effect_init++;
 				blockload = 1;
-				memset( master_bright, (1<<7) | 15, 2 );
+				memset( master_bright, (1<<7) | 16, 2 );
 				effect6_destroy();
 				effect1_init();
+				effect1_update(t);				
 				blockload = 0;
 			}
 			effect1_update(t);
@@ -267,9 +273,10 @@ int main()
 			if(next_effect_init < 8) {
 				next_effect_init++;
 				blockload = 1;
-				memset( master_bright, (1<<7) | 15, 2 );
+				memset( master_bright, (1<<7) | 16, 2 );
 				effect1_destroy();
 				InitField();
+				RunField(t);
 				RunField(t);
 				blockload = 0;
 			}
@@ -280,7 +287,7 @@ int main()
 			if(next_effect_init < 9) {
 				next_effect_init++;
 				blockload = 1;
-				memset( master_bright, (1<<7) | 15, 2 );
+				memset( master_bright, (1<<7) | 16, 2 );
 				StopField();
 				// TODO Outro init
 				blockload = 0;
@@ -306,7 +313,7 @@ static void vblank() {
 	uint32_t t2 = t - toff;
 	
 	if( t2 <= scur || blockload ) {
-		memset( master_bright, (1<<7) | 15, 2 );
+		memset( master_bright, (1<<7) | 16, 2 );
 	} else if( t2 < scur+20 ) {
 		int16_t val = (scur+20)-t2;
 		if(val > 15) {
@@ -322,7 +329,7 @@ static void vblank() {
 		memset( master_bright, (1<<7) | val, 2 );
 	}
 	else {
-		memset( master_bright, (1<<7) | 15, 2 );
+		memset( master_bright, (1<<7) | 16, 2 );
 	}
 
 	effect0_update(t-toff);

@@ -19,6 +19,17 @@ void effect4_init() {
 	BG3PD_A = (1 << 8);
 	BG3X_A = 0;
 	BG3Y_A = 0;
+
+	BG2CNT_A = BGxCNT_EXTENDED_BITMAP_16 | BGxCNT_OVERFLOW_WRAP | BGxCNT_BITMAP_SIZE_256x256 | BGxCNT_BITMAP_BASE_0K;
+	BG2CNT_A = (BG2CNT_A&~BGxCNT_PRIORITY_MASK)|BGxCNT_PRIORITY_0;
+	BG2PA_A = (1 << 8);
+	BG2PB_A = 0;
+	BG2PC_A = 0;
+	BG2PD_A = (1 << 8);
+	BG3X_A = 0;
+	BG3Y_A = 0;
+
+	loadImageVRAMIndirectGreen( "nitro:/gfx/ribbon_frame.img.bin", VRAM_A_OFFS_0K,256*256*2);
 }
 
 u8 effect4_update( u32 t ) {
@@ -38,7 +49,7 @@ u8 effect4_update( u32 t ) {
 
 	
 	
-	for(int y = 0; y < 192; y++) {
+	for(int y = 0; y < 192; y+=2) {
 		dy1 = (y-y1);
 		dy1 = dy1*dy1;
 		dy2 = (y-y2);
@@ -55,6 +66,26 @@ u8 effect4_update( u32 t ) {
 			}
 			else {
 				screen[x+y*256] = MakeRGB15(28,28,28);
+			}
+		}
+	}
+	for(int y = 1; y < 192; y+=2) {
+		dy1 = (y-y1);
+		dy1 = dy1*dy1;
+		dy2 = (y-y2);
+		dy2 = dy2*dy2;
+		for(int x = 0; x < 256; x++) {
+			dx1 = (x-x1);
+			dx1 = dx1*dx1;
+			dx2 = (x-x2);
+			dx2 = dx2*dx2;
+			d1 = ((dx1+dy1)>>12) & 1;
+			d2 = ((dx2+dy2)>>12) & 1;
+			if((d1^d2) == 1) {
+				screen[x+y*256] = MakeRGB15(23,6,6);
+			}
+			else {
+				screen[x+y*256] = MakeRGB15(24,24,24);
 			}
 		}
 	}

@@ -234,10 +234,15 @@ s16 g_tris = 0;
 s8 mark_grid[30][30][30];
 
 // Let's recurse but not!
-s16 pc[400][3];
+// s16 pc[400][3];
+s16 *pc = (s8*)(0x027C0000 + 256 * sizeof( s16 ) + 256*16*sizeof( s8 ))
+
+#define PC(x,y) pc[400*x+y]
+
 s16 cp = 0;
 
-inline void step_to_pc( s32 x, s32 y, s32 z ) {
+static inline void ATTR_ITCM step_to_pc( s32 x, s32 y, s32 z );
+static inline void ATTR_ITCM step_to_pc( s32 x, s32 y, s32 z ) {
 	pc[ cp + 1 ][ 0 ] = x + 1;
 	pc[ cp + 1 ][ 1 ] = y;
 	pc[ cp + 1 ][ 2 ] = z;
@@ -265,7 +270,8 @@ inline void step_to_pc( s32 x, s32 y, s32 z ) {
 	cp += 7;
 }
 
-u32 balls( s32* x, s32* y, s32* z, s8 ball_count, TRIANGLE* tris ) {
+static inline u32 ATTR_ITCM balls( s32* x, s32* y, s32* z, s8 ball_count, TRIANGLE* tris );
+static inline u32 ATTR_ITCM balls( s32* x, s32* y, s32* z, s8 ball_count, TRIANGLE* tris ) {
 	g_tris = 0;
 
 	// Reset status
@@ -369,12 +375,12 @@ void metaballs_update(s32 t) {
 	
 	// Draw the created mesh.
 	DSBegin( DS_TRIANGLES );
-	for( u16 i = 0; i < tri_count; i+=2 ) {
+	for( u16 i = 0; i < tri_count; i++ ) {
 		for( s8 j = 0; j < 3; j++ ) {
 			DSColor3b(
-				(triangles[ i ].p[ j ].inf[0]*29 + triangles[ i ].p[ j ].inf[1]*30 + triangles[ i ].p[ j ].inf[2]*2)>>14,
-				(triangles[ i ].p[ j ].inf[0]*29 + triangles[ i ].p[ j ].inf[1]*18 + triangles[ i ].p[ j ].inf[2]*2)>>14,
-				(triangles[ i ].p[ j ].inf[0]*29 + triangles[ i ].p[ j ].inf[1]*18 + triangles[ i ].p[ j ].inf[2]*2)>>14
+				(triangles[ i ].p[ j ].inf[0]*29 + triangles[ i ].p[ j ].inf[1]*30 + triangles[ i ].p[ j ].inf[2]*31)>>14,
+				(triangles[ i ].p[ j ].inf[0]*29 + triangles[ i ].p[ j ].inf[1]*18 + triangles[ i ].p[ j ].inf[2]*8)>>14,
+				(triangles[ i ].p[ j ].inf[0]*29 + triangles[ i ].p[ j ].inf[1]*18 + triangles[ i ].p[ j ].inf[2]*8)>>14
 
 			);
 			DSVertex3v16( triangles[ i ].p[ j ].x, triangles[ i ].p[ j ].y, triangles[ i ].p[ j ].z );

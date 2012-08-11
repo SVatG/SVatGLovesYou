@@ -6,6 +6,8 @@
 
 #include <math.h>
 
+#include "ARM.h"
+
 // R^3 position
 typedef struct {
 	s16 x;
@@ -330,7 +332,8 @@ s8 i_triTable[ 256 ][ 16 ] = {
 // s8 *triTable = &(i_triTable[0][0]);
 
 s16 *edgeTable = (s16*)(0x027C0000);
-s8 *triTable = (s8*)(0x027C0000 + 256 * sizeof( s16 ));
+s8 *triTable = (s8*)(0x027C0000 + 256 * sizeof( s16 ));;
+
 void copyTables() {
 	for( int i = 0; i < 256; i++ ) {
 		edgeTable[ i ] = i_edgeTable[ i ];
@@ -346,7 +349,8 @@ void copyTables() {
    Linearly interpolate the position where an isosurface cuts
    an edge between two vertices, each with their own scalar value
 */
-static inline XYZ VertexInterp( s32 isolevel, XYZ p1, XYZ p2, s32 valp1, s32 valp2 ) {
+static inline XYZ ATTR_ITCM VertexInterp( s32 isolevel, XYZ p1, XYZ p2, s32 valp1, s32 valp2 );
+static inline XYZ ATTR_ITCM VertexInterp( s32 isolevel, XYZ p1, XYZ p2, s32 valp1, s32 valp2 ) {
 	s32 mu;
 	XYZ p;
 	
@@ -370,7 +374,8 @@ static inline XYZ VertexInterp( s32 isolevel, XYZ p1, XYZ p2, s32 valp1, s32 val
 // set the proper triangles and return how many were set.
 // (0 -> entirely in- or outside the isosurface)
 // Edge isolevels are linearily interpolated.
-static inline u8 polygonise( GRIDCELL* grid, u32 isolevel, TRIANGLE *triangles ) {
+static inline u8 ATTR_ITCM polygonise( GRIDCELL* grid, u32 isolevel, TRIANGLE *triangles );
+static inline u8 ATTR_ITCM polygonise( GRIDCELL* grid, u32 isolevel, TRIANGLE *triangles ) {
 	u8 i, ntriang;
 	u8 cubeindex;
 	XYZ vertlist[12];

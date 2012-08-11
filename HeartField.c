@@ -5,6 +5,9 @@
 
 #include <math.h>
 
+#include <nds.h>
+#include <nds/registers_alt.h>
+
 #define PartSize 1024
 
 uint32_t heartlist[PartSize];
@@ -197,7 +200,40 @@ static void PlaceHeart(struct Heart *heart)
 
 void InitHeartField()
 {
-	DISPCNT_A=DISPCNT_MODE_0|DISPCNT_ON|DISPCNT_3D|DISPCNT_BG0_ON;
+	DISPCNT_A=DISPCNT_MODE_5|DISPCNT_3D|DISPCNT_BG0_ON|DISPCNT_BG2_ON|DISPCNT_BG3_ON|DISPCNT_ON;
+
+	BLDCNT_A = BLDCNT_SRC_A_BG3|BLDCNT_SRC_B_BG0|BLDCNT_EFFECT_ALPHA;
+	BLDALPHA_A = BLDALPHA_EVA(8)|BLDALPHA_EVB(15);
+
+	// BG and frame
+	VRAMCNT_D = VRAMCNT_D_LCDC;
+	VRAMCNT_B = VRAMCNT_B_BG_VRAM_A_OFFS_0K;
+	VRAMCNT_A = VRAMCNT_A_BG_VRAM_A_OFFS_128K;
+
+	loadImageVRAMIndirectGreen( "nitro:/gfx/tunnel_frame.img.bin", VRAM_A_OFFS_0K,256*256*2);
+	loadImageVRAMIndirectGreen( "nitro:/gfx/stripe_bg_hori.img.bin", VRAM_A_OFFS_128K,256*256*2);
+
+	BG2CNT_A = BGxCNT_EXTENDED_BITMAP_16 | BGxCNT_OVERFLOW_WRAP | BGxCNT_BITMAP_SIZE_256x256 | BGxCNT_BITMAP_BASE_0K;
+	BG2CNT_A = (BG2CNT_A&~BGxCNT_PRIORITY_MASK)|BGxCNT_PRIORITY_0;
+	BG2_XDX = (1 << 8);
+	BG2_XDY = 0;
+	BG2_YDX = 0;
+	BG2_YDY = (1 << 8);
+	BG2_CX = 0;
+	BG2_CY = 0;
+
+	// Init BG0 priority as above BG3
+	BG0CNT_A = (BG0CNT_A&~BGxCNT_PRIORITY_MASK)|BGxCNT_PRIORITY_2;
+
+	BG3CNT_A = BGxCNT_EXTENDED_BITMAP_16 | BGxCNT_OVERFLOW_WRAP | BGxCNT_BITMAP_SIZE_256x256 | BGxCNT_BITMAP_BASE_128K;
+	BG3CNT_A = (BG3CNT_A&~BGxCNT_PRIORITY_MASK)|BGxCNT_PRIORITY_1;
+	BG3_XDX = (1 << 8);
+	BG3_XDY = 0;
+	BG3_YDX = 0;
+	BG3_YDY = (1 << 8);
+	BG3_CX = 0;
+	BG3_CY = 0;
+	
 
 	DSInit3D();
 	DSViewport(0,0,255,191);

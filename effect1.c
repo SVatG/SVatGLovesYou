@@ -7,10 +7,16 @@
 u16* dot_sprite[8];
 u16* front_sprite[12];
 
+int tstart = -1;
+int line_start[5];
+
 void effect1_init() {
 	DISPCNT_A = DISPCNT_MODE_5 | DISPCNT_BG2_ON | DISPCNT_BG3_ON | DISPCNT_OBJ_ON | DISPCNT_ON;
 	VRAMCNT_D = VRAMCNT_D_BG_VRAM_A_OFFS_128K;
 	VRAMCNT_B = VRAMCNT_B_BG_VRAM_A_OFFS_0K;
+
+	oamClear(&oamMain,0,128);
+	oamUpdate(&oamMain);
 	
 	BG3CNT_A = BGxCNT_EXTENDED_BITMAP_16 | BGxCNT_BITMAP_SIZE_256x256 | BGxCNT_OVERFLOW_WRAP | BGxCNT_BITMAP_BASE_0K;
 	BG3CNT_A = (BG3CNT_A&~BGxCNT_PRIORITY_MASK)|BGxCNT_PRIORITY_2;
@@ -21,6 +27,8 @@ void effect1_init() {
 	BG3X_A = 0;
 	BG3Y_A = 0;
 
+	memset( VRAM_A_OFFS_128K, 0, 256*256*2);
+	
 	loadImage( "nitro:/gfx/ecgback.img.bin", VRAM_A_OFFS_0K,256*256*2);
 	
 	BG2CNT_A = BGxCNT_EXTENDED_BITMAP_16 | BGxCNT_BITMAP_SIZE_256x256 | BGxCNT_OVERFLOW_TRANSPARENT | BGxCNT_BITMAP_BASE_128K;
@@ -31,7 +39,7 @@ void effect1_init() {
 	BG2PD_A = icos(900)>>4;
 	BG2X_A = -5000;
 	BG2Y_A = 40000;
-
+	
 	VRAMCNT_A = VRAMCNT_A_OBJ_VRAM_A;
 
 	oamInit(&oamMain, SpriteMapping_Bmp_1D_128, false);
@@ -63,6 +71,15 @@ void effect1_init() {
 	vu16* mem_BLDCNT_A = (vu16*)(0x04000050);
 	*mem_BLDCNT_A = /*BIT(4) |*/ BIT(6) | BIT(0) | BIT(8) | BIT(9) | BIT(10) | BIT(11) | BIT(12) | BIT(13) | BIT(2);
 	BLDALPHA_A = BLDALPHA_EVA(15)|BLDALPHA_EVB(15);
+
+	for(int i = 0; i < 5; i++) {
+		line_start[i] = 50+i*35;
+	}
+	
+	int line_size[5];
+	for(int i = 0; i < 5; i++) {
+		line_start[i] = heartbeat((0+((i*348923)%17777))%(80+((i*2981)%60)), line_start[i], &line_size[i], 50+i*35);
+	}
 }
 
 int heartbeat(int tmod, int arra_s, int* arra_r, int station) {
@@ -109,8 +126,14 @@ int heartbeat(int tmod, int arra_s, int* arra_r, int station) {
 	return arra_s;
 }
 
-int line_start[5];
 void drawbars(int t) {
+	if(tstart < 0) {
+		tstart = t + 4000;
+		t = 0;
+	}
+	else {
+		t = t - tstart + 5000;
+	}
 	u16* bg = (u16*)(VRAM_A_OFFS_0K+0x10000);
 	
 	int arra_r = 0;
@@ -150,10 +173,10 @@ void drawbars(int t) {
 u8 effect1_update( u32 t ) {
 	BG3X_A = t*800;
 	BG3Y_A = -t*512;
-	
-	drawbars(t);
-	drawbars(t);
 
+	drawbars(t);
+	drawbars(t);
+	
 	for(int i = 0; i < 12; i++ ) {
 		oamSet(
 			&oamMain, i,
