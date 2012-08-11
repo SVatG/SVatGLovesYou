@@ -182,7 +182,8 @@ int main()
 		else if(t - toff < 3*DUR) {
 			if(next_effect_init < 1) {
 				fadeinout(t-toff,2*DUR,3*DUR);
-				blockload = 1;			
+				blockload = 1;
+				memset( master_bright, (1<<7) | 15, 2 );
 				next_effect_init++;
 				// LATER TODO: Destroy intro
 				effect4_init();
@@ -195,6 +196,7 @@ int main()
 				fadeinout(t-toff,3*DUR,4*DUR);				
 				next_effect_init++;
 				blockload = 1;
+				memset( master_bright, (1<<7) | 15, 2 );
 				effect4_destroy();
 				effect3_init();
 				blockload = 0;
@@ -205,7 +207,8 @@ int main()
 			if(next_effect_init < 3) {
 				fadeinout(t-toff,4*DUR,5*DUR);				
 				next_effect_init++;
-				blockload = 1;				
+				blockload = 1;
+				memset( master_bright, (1<<7) | 15, 2 );
 				effect3_destroy();
 				metaballs_init();
 				blockload = 0;
@@ -216,6 +219,7 @@ int main()
 			if(next_effect_init < 4) {
 				next_effect_init++;
 				blockload = 1;
+				memset( master_bright, (1<<7) | 15, 2 );
 				metaballs_destroy();
 				InitHeartField();
 				blockload = 0;
@@ -227,6 +231,7 @@ int main()
 			if(next_effect_init < 5) {
 				next_effect_init++;
 				blockload = 1;
+				memset( master_bright, (1<<7) | 15, 2 );
 				// No stop heart field.
 				effect2_init();
 				blockload = 0;
@@ -238,6 +243,7 @@ int main()
 			if(next_effect_init < 6) {
 				next_effect_init++;
 				blockload = 1;
+				memset( master_bright, (1<<7) | 15, 2 );
 				effect2_destroy();
 				effect6_init();
 				blockload = 0;
@@ -249,6 +255,7 @@ int main()
 			if(next_effect_init < 7) {
 				next_effect_init++;
 				blockload = 1;
+				memset( master_bright, (1<<7) | 15, 2 );
 				effect6_destroy();
 				effect1_init();
 				blockload = 0;
@@ -260,6 +267,7 @@ int main()
 			if(next_effect_init < 8) {
 				next_effect_init++;
 				blockload = 1;
+				memset( master_bright, (1<<7) | 15, 2 );
 				effect1_destroy();
 				InitField();
 				RunField(t);
@@ -272,6 +280,7 @@ int main()
 			if(next_effect_init < 9) {
 				next_effect_init++;
 				blockload = 1;
+				memset( master_bright, (1<<7) | 15, 2 );
 				StopField();
 				// TODO Outro init
 				blockload = 0;
