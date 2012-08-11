@@ -4,5 +4,6 @@
 void effect3_init();
 u8 effect3_update( u32 t );
 void effect3_destroy();
+void preloadSprites();
 
 #endif

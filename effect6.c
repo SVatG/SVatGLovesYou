@@ -183,5 +183,18 @@ uint8_t effect6_update( uint32_t t ) {
 
 void effect6_destroy() {
 	CleanupVoxelBlock(&block);
+
+	oamClear(&oamMain,0,128);
+	oamUpdate(&oamMain);
+
+	BG3PA_A=(1<<8);
+	BG3PB_A=0;
+	BG3PC_A=0;
+	BG3PD_A=(1<<8);
+	BG3X_A=0;
+	BG3Y_A=0;
+
+	BLDCNT_A = 0;
+	BLDALPHA_A = 0;
 }
 

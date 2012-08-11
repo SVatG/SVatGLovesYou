@@ -109,6 +109,16 @@ void effect2_destroy() {
 	for(int i = 0; i < 11; i++) {
 		oamFreeGfx(&oamMain,greet_border_sprite[i]);
 	}
+	oamClear(&oamMain,0,128);
+	oamUpdate(&oamMain);
+
+	BG3PA_A=(1<<8);
+	BG3PB_A=0;
+	BG3PC_A=0;
+	BG3PD_A=(1<<8);
+	BG3X_A=0;
+	BG3Y_A=0;
+	
 	BLDCNT_A = 0;
 	BLDALPHA_A = 0;
 }

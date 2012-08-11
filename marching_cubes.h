@@ -326,21 +326,21 @@ s8 i_triTable[ 256 ][ 16 ] = {
 	{-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1}
 };
 
-s16 *edgeTable = &(i_edgeTable[0]);
-s8 *triTable = &(i_triTable[0][0]);
+// s16 *edgeTable = &(i_edgeTable[0]);
+// s8 *triTable = &(i_triTable[0][0]);
 
-// s16 *edgeTable = (s16*)(0x027C0000);
-// s8 *triTable = (s8*)(0x027C0000 + 256 * sizeof( s16 ));
-// void copyTables() {
-// 	for( int i = 0; i < 256; i++ ) {
-// 		edgeTable[ i ] = i_edgeTable[ i ];
-// 	}
-// 	for( int i = 0; i < 256; i++ ) {
-// 		for( int j = 0; j < 16; j++ ) {
-// 			triTable[16*i+j] = i_triTable[ i ][ j ];
-// 		}
-// 	}
-// }
+s16 *edgeTable = (s16*)(0x027C0000);
+s8 *triTable = (s8*)(0x027C0000 + 256 * sizeof( s16 ));
+void copyTables() {
+	for( int i = 0; i < 256; i++ ) {
+		edgeTable[ i ] = i_edgeTable[ i ];
+	}
+	for( int i = 0; i < 256; i++ ) {
+		for( int j = 0; j < 16; j++ ) {
+			triTable[16*i+j] = i_triTable[ i ][ j ];
+		}
+	}
+}
 
 /*
    Linearly interpolate the position where an isosurface cuts

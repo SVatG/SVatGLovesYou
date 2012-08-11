@@ -177,6 +177,8 @@ void metaballs_precompute() {
 		}
 		tx += cell_size;
 	}
+	
+	copyTables();	
 }
 
 // mah balls.
@@ -226,8 +228,6 @@ void metaballs_init() {
 	DSPolygonAttributes(DS_POLY_CULL_NONE|DS_POLY_LIGHT0|DS_POLY_ALPHA(0)|DS_POLY_MODE_MODULATION);
 
 	triangles = malloc(sizeof(TRIANGLE)*1200);
-	
-// 	copyTables();
 }
 
 s16 g_tris = 0;
@@ -369,7 +369,7 @@ void metaballs_update(s32 t) {
 	
 	// Draw the created mesh.
 	DSBegin( DS_TRIANGLES );
-	for( u16 i = 0; i < tri_count; i++ ) {
+	for( u16 i = 0; i < tri_count; i+=2 ) {
 		for( s8 j = 0; j < 3; j++ ) {
 			DSColor3b(
 				(triangles[ i ].p[ j ].inf[0]*29 + triangles[ i ].p[ j ].inf[1]*30 + triangles[ i ].p[ j ].inf[2]*2)>>14,

@@ -60,12 +60,14 @@ void effect0_init() {
 void updatecol(int t) {
 	dmaCopyHalfWords( 0, textTable, PALRAM_B + 51 , 12 );
 	for(int i = 0; i < 51; i++) {
-		dmaCopyHalfWords( 0, flowTable + ((t/4+255-i)%11), PALRAM_B + i%255 , 2 );
+		dmaCopyHalfWords( 0, flowTable + (((t+8*4)/4+255-i)%12), PALRAM_B + i%255 , 2 );
 	}
 }
 
 u8 effect0_update( u32 t ) {
-	int dx = (abs(isin( (512-128-64) + (t*24000)/512)))>>8;
+	t += 10;
+	t *= ((12.5*16.0)/60.0);
+	int dx = (abs(isin((t*8192)/512)))>>8;
 	BG2PA_B = (1 << 8) - dx;
 	BG2PB_B = 0;
 	BG2PC_B = 0;
@@ -73,7 +75,7 @@ u8 effect0_update( u32 t ) {
 	BG2X_B = (1<<10);
 	BG2Y_B = (1<<10);
 	
-	updatecol(t);
+	updatecol((t*12.0)/32.0);
 
 	if(switchin_status < 128) {
 		for(int y = 0; y < 128; y++) {

@@ -40,13 +40,13 @@ typedef struct ribbon {
 ribbon ribbons[RIBBON_COUNT];
 
 typedef struct row_tile {
-	int x;
-	int y;
+	u16 x;
+	u16 y;
 	u16* sprite;
-	int prio;
+	u8 prio;
 } row_tile;
 
-row_tile* row_tiles[12];
+row_tile row_tiles[12][MAX_PERROW];
 int row_tile_counts[12];
 
 void switchSprites() {
@@ -271,17 +271,27 @@ void loadSprites() {
 	ribbonSprite[DIR_RIGHT][DIR_DOWN][3] = loadSprite16A( "nitro:/gfx/ribbon_right_down_4.img.bin" );
 }
 
+// Only possible if vram bank a remains untouched.
+void preloadSprites() {
+	DISPCNT_A = DISPCNT_MODE_5 | DISPCNT_OBJ_ON | DISPCNT_BG2_ON | DISPCNT_BG3_ON | DISPCNT_ON;
+	VRAMCNT_A = VRAMCNT_A_OBJ_VRAM_A;
+	VRAMCNT_B = VRAMCNT_B_BG_VRAM_A_OFFS_0K;
+	VRAMCNT_D = VRAMCNT_D_BG_VRAM_A_OFFS_128K;
+	oamInit(&oamMain, SpriteMapping_Bmp_1D_128, false);
+	loadSprites();
+}
+
 void effect3_init() {
 
-	for(int i = 0; i < 12; i++) {
-		row_tiles[i] = malloc(sizeof(row_tile)*MAX_PERROW);
-	}
+// 	for(int i = 0; i < 12; i++) {
+// 		row_tiles[i] = malloc(sizeof(row_tile)*MAX_PERROW);
+// 	}
 
 	for(int i = 0; i < RIBBON_COUNT; i++) {
 		ribbons[i].tiles = malloc(MAX_SEGMENTS * sizeof(ribbon_tile));
 	}
 	
-	DISPCNT_A = DISPCNT_MODE_5 | DISPCNT_OBJ_ON | DISPCNT_BG2_ON | DISPCNT_BG3_ON | DISPCNT_ON;
+	// DISPCNT_A = DISPCNT_MODE_5 | DISPCNT_OBJ_ON | DISPCNT_BG2_ON | DISPCNT_BG3_ON | DISPCNT_ON;
 
 	VRAMCNT_A = VRAMCNT_A_OBJ_VRAM_A;
 	VRAMCNT_B = VRAMCNT_B_BG_VRAM_A_OFFS_0K;
@@ -306,15 +316,11 @@ void effect3_init() {
 	BG3_CY = 0;
 
 	loadImageVRAMIndirectGreen( "nitro:/gfx/ribbon_frame.img.bin", VRAM_A_OFFS_0K,256*256*2);
-	loadImage( "nitro:/gfx/stripe_bg.img.bin", VRAM_A_OFFS_128K,256*256*2);
+	loadImageVRAMIndirectGreen( "nitro:/gfx/stripe_bg.img.bin", VRAM_A_OFFS_128K,256*256*2);
 
 	vu16* mem_BLDCNT_A = (vu16*)(0x04000050);
 	*mem_BLDCNT_A = BLDCNT_SRC_A_OBJ | BLDCNT_SRC_B_BG3 | BLDCNT_EFFECT_ALPHA;
 	BLDALPHA_A = BLDALPHA_EVA(10)|BLDALPHA_EVB(6);
-
-	oamInit(&oamMain, SpriteMapping_Bmp_1D_128, false);
-
-	loadSprites();
 	
 	// Palette
 	load8bVRAMIndirect("nitro:/gfx/ribbon_right_left_1.pal.bin", PALRAM_OBJ_A,256);
@@ -634,9 +640,9 @@ void effect3_destroy() {
 			}
 		}
 	}
-	for(int i = 0; i < 12; i++) {
-		free(row_tiles[i]);
-	}
+// 	for(int i = 0; i < 12; i++) {
+// 		free(row_tiles[i]);
+// 	}
 	for(int i = 0; i < RIBBON_COUNT; i++) {
 		free(ribbons[i].tiles);
 	}
