@@ -19,28 +19,27 @@ char* greet_images[9] = {
 	"nitro:/gfx/greethaato_ms.img.bin",
 	"nitro:/gfx/greethaato_sysk.img.bin",
 	"nitro:/gfx/greethaato_gt.img.bin",
-	"nitro:/gfx/greethaato_blank.img.bin",	
+	"nitro:/gfx/greethaato_blank.img.bin",
 };
 
 int fds[9];
 
 void preopen() {
-	for(int i = 0; i < 8; i++) {
+	for(int i = 0; i < 9; i++) {
 		fds[i] = open( greet_images[i], O_RDONLY );
 	}
 }
 
-void loadImageX(int id, uint16_t* buffer, uint32_t size) {
-	read( fds[id], buffer, size );
-	close( fds[id] );
-
-	// Ensure alpha bit is set
-	for( int i = 0; i < size/2; i++ ) {
-		buffer[i] |= BIT(15);
+void loadImageX(int id, uint16_t* buffer, uint32_t size, int i) {
+	read( fds[id], buffer + i*(size/64), size/32 );
+	if(i == 31) {
+		close( fds[id] );
 	}
 }
 
 u16* greet_border_sprite[12];
+int loadStatus = 100000;
+
 void effect2_init() {
 	preopen();
 	
@@ -112,25 +111,30 @@ u8 effect2_update( u32 t ) {
 		);
 	}
 	
-	if(t%256 < 4 && last_greet_loaded == 0) {
+	if(last_greet_loaded % 256 > t % 256 ) {
 		last_greet_loaded = 1;
 		greet_id = (greet_id + 1)%8;
-		loadImageX(greet_id,VRAM_A_OFFS_0K,256*256*2);
+		loadStatus = 0;
 	}
-	else {
-		last_greet_loaded = 0;
+	last_greet_loaded = t;
+
+	if(loadStatus < 32) {
+		loadImageX(greet_id,VRAM_A_OFFS_0K,256*256*2, loadStatus);
+		loadStatus++;
 	}
 	
 	dx *= scale;
 	dy *= scale;
-	
-	BG3PA_A=dx;
-	BG3PB_A=dy;
-	BG3PC_A=-dy;
-	BG3PD_A=dx;
-	BG3X_A=(-128*dx-92*dy+(128<<8));
-	BG3Y_A=(+128*dy-92*dx+(128<<8));
 
+	if(scale > 0.7) {
+		BG3PA_A=dx;
+		BG3PB_A=dy;
+		BG3PC_A=-dy;
+		BG3PD_A=dx;
+		BG3X_A=(-128*dx-92*dy+(128<<8));
+		BG3Y_A=(+128*dy-92*dx+(128<<8));
+	}
+	
 	oamUpdate(&oamMain);
 }
 

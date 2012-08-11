@@ -7,7 +7,7 @@
 my $grit_default = <<ENDGRIT
 # 8 bit bitmap
 -gB8
--gt
+-gb
 -pT0
 
 ENDGRIT

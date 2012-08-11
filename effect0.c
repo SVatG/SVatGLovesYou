@@ -6,10 +6,17 @@
 
 #include "RainbowTable.h"
 
-const char* spriteNames[3] = {
+const char* spriteNames[10] = {
+	"nitro:/gfx/haato_inter.img.bin",
+	"nitro:/gfx/haato_ribbons.img.bin",
 	"nitro:/gfx/haato_metaballs.img.bin",
+	"nitro:/gfx/haato_tunnels.img.bin",
+	"nitro:/gfx/haato_greets.img.bin",
+	"nitro:/gfx/haato_cubes.img.bin",
 	"nitro:/gfx/haato_thatone.img.bin",
 	"nitro:/gfx/haato_raymarching.img.bin",
+	"nitro:/gfx/haato_self.img.bin",
+	"nitro:/gfx/haato_evoke.img.bin",
 };
 
 uint8_t* effect0_loadimage;
@@ -22,18 +29,41 @@ void effect0_change(int toIndex) {
 	switchin_status = 0;
 }
 
+u16* bgtile;
 void effect0_init() {
+
+	VRAMCNT_I = VRAMCNT_I_OBJ_VRAM_B;
 
 	// Temp image for loadin
 	effect0_loadimage = (uint8_t*)malloc(128*128);
 	
 	// VRAM and DISP setup.
 	VRAMCNT_C = VRAMCNT_C_BG_VRAM_B;
-	DISPCNT_B = DISPCNT_MODE_5 | DISPCNT_BG2_ON | DISPCNT_BG3_ON | DISPCNT_ON;
+	DISPCNT_B = DISPCNT_MODE_5 | DISPCNT_BG2_ON | DISPCNT_BG3_ON | DISPCNT_OBJ_ON | DISPCNT_ON;
 
+	oamInit(&oamSub, SpriteMapping_Bmp_1D_128, false);
+	bgtile = loadBmpSpriteB( "nitro:/gfx/stripe_tile.img.bin" );
+
+	for(int i = 0; i < 48; i++ ) {
+		oamSet(
+			&oamSub, i,
+			32*(i%8),32*(i/8),
+			0, 4,
+			SpriteSize_32x32,
+			SpriteColorFormat_Bmp,
+			bgtile,
+			32, false, false, false, false, false
+		);
+	}
+
+	oamUpdate(&oamSub);
+	
+	BLDCNT_B = BLDCNT_SRC_A_OBJ|BLDCNT_SRC_B_BG2|BLDCNT_SRC_B_BG3|BLDCNT_EFFECT_ALPHA;
+	BLDALPHA_B = BLDALPHA_EVA(15)|BLDALPHA_EVB(15);
+	
 	// Init BG2 top priority
 	BG2CNT_B = BGxCNT_EXTENDED_BITMAP_8 | BGxCNT_BITMAP_SIZE_256x256 | BGxCNT_OVERFLOW_WRAP | BGxCNT_BITMAP_BASE_0K;
-	BG2CNT_B = (BG2CNT_B&~BGxCNT_PRIORITY_MASK)|BGxCNT_PRIORITY_0;
+	BG2CNT_B = (BG2CNT_B&~BGxCNT_PRIORITY_MASK)|BGxCNT_PRIORITY_1;
 	BG2PA_B = (1 << 8);
 	BG2PB_B = 0;
 	BG2PC_B = 0;
@@ -43,7 +73,7 @@ void effect0_init() {
 
 	// Init BG3 bottom priority
 	BG3CNT_B = BGxCNT_EXTENDED_BITMAP_8 | BGxCNT_BITMAP_SIZE_256x256 | BGxCNT_OVERFLOW_WRAP | BGxCNT_BITMAP_BASE_64K;
-	BG3CNT_B = (BG3CNT_B&~BGxCNT_PRIORITY_MASK)|BGxCNT_PRIORITY_1;
+	BG3CNT_B = (BG3CNT_B&~BGxCNT_PRIORITY_MASK)|BGxCNT_PRIORITY_2;
 	BG3PA_B = (1 << 8);
 	BG3PB_B = 0;
 	BG3PC_B = 0;
@@ -66,7 +96,7 @@ void updatecol(int t) {
 
 u8 effect0_update( u32 t ) {
 	t += 10;
-	t *= ((12.5*16.0)/60.0);
+	t *= ((12.5004*16.0)/60.0);
 	int dx = (abs(isin((t*8192)/512)))>>8;
 	BG2PA_B = (1 << 8) - dx;
 	BG2PB_B = 0;

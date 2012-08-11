@@ -38,9 +38,6 @@ LIBS7 = -L$(DEVKITPRO)/libnds/lib -lnds7 -lmm7 -ldswifi7
 # compiled.
 BITMAPS = gfx/svatgst_indexed.bin \
           gfx/svatgst_textonly.bin \
-          gfx/haato_metaballs.bin \
-	  gfx/haato_raymarching.bin \
-	  gfx/haato_thatone.bin \
 	  gfx/ball_bg_stripes.bin \
 	  gfx/ecgdot_0.bin \
 	  gfx/ecgdot_1.bin \
@@ -65,6 +62,7 @@ BITMAPS = gfx/svatgst_indexed.bin \
 	  gfx/ecgfront_tiles_10.bin \
 	  gfx/ecgfront_tiles_11.bin \
 	  gfx/greethaato_blank.bin \
+	  gfx/lovesyou.bin \
 	  gfx/stripe_bg.bin \
 	  gfx/greethaato_mercury.bin \
 	  gfx/greethaato_k2.bin \
@@ -156,7 +154,22 @@ BITMAPS = gfx/svatgst_indexed.bin \
 	gfx/ribbon_heart.bin \
 	gfx/ribbon_frame.bin \
 	gfx/tunnel_frame.bin \
-	gfx/stripe_bg_hori.bin
+	gfx/stripe_bg_hori.bin \
+	gfx/self_heart.bin \
+	gfx/vote_heart.bin \
+	gfx/you_heart.bin \
+	gfx/stripe_tile.bin \
+	gfx/haato_inter.bin \
+	gfx/haato_ribbons.bin \
+	gfx/haato_metaballs.bin \
+	gfx/haato_metaballs.bin \
+	gfx/haato_tunnels.bin \
+	gfx/haato_greets.bin \
+	gfx/haato_cubes.bin \
+	gfx/haato_thatone.bin \
+	gfx/haato_raymarching.bin \
+	gfx/haato_self.bin \
+	gfx/haato_evoke.bin
 
 	  
 # Compiler setup

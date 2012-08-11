@@ -85,6 +85,11 @@ uint16_t* loadBmpSpriteA( char* path ) {
 	loadImageVRAMIndirect( path, newSprite, 64*64 );
 	return( newSprite );
 }
+uint16_t* loadBmpSpriteB( char* path ) {
+	uint16_t* newSprite = oamAllocateGfx(&oamSub, SpriteSize_32x32, SpriteColorFormat_Bmp);
+	loadImageVRAMIndirect( path, newSprite, 64*64 );
+	return( newSprite );
+}
 uint16_t* loadBmpSpriteAGreen( char* path ) {
 	uint16_t* newSprite = oamAllocateGfx(&oamMain, SpriteSize_64x64, SpriteColorFormat_Bmp);
 	loadImageVRAMIndirectGreen( path, newSprite, 64*64*2 );

@@ -19,6 +19,9 @@ u16* ribbonSprite[4][4][4];
 u16* zeroSprite[4];
 u16* heartSprite;
 
+extern volatile int unts;
+extern volatile int unts_proc;
+
 typedef struct ribbon_tile {
 	int x;
 	int y;
@@ -332,7 +335,20 @@ void effect3_init() {
 	irqEnable( IRQ_HBLANK );	
 }
 
+int rcounter = 0;
+int rcounter2 = 0;
 void update_ribbons() {
+	if(unts != 0 && unts_proc == 0) {
+		rcounter++;
+		unts_proc = 1;
+		if(rcounter == 4) {
+			rcounter2++;
+			rcounter = 1;
+			if(rcounter2 <= 2) {
+				reset_ribbons();
+			}
+		}
+	}
 	for(int ribbon_cnt = 0; ribbon_cnt < RIBBON_COUNT; ribbon_cnt++) {
 		ribbons[ribbon_cnt].head_status = (ribbons[ribbon_cnt].head_status + 1) % 8;
 		if(ribbons[ribbon_cnt].head_status == 0) {

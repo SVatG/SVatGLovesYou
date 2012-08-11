@@ -377,7 +377,7 @@ void metaballs_update(s32 t) {
 	
 	// Draw the created mesh.
 	DSBegin( DS_TRIANGLES );
-	for( u16 i = 0; i < tri_count; i++ ) {
+	for( u16 i = 0; i < tri_count; i+=2 ) {
 		for( s8 j = 0; j < 3; j++ ) {
 			DSColor3b(
 				(triangles[ i ].p[ j ].inf[0]*29 + triangles[ i ].p[ j ].inf[1]*30 + triangles[ i ].p[ j ].inf[2]*31)>>14,
