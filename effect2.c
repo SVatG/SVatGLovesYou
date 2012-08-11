@@ -10,16 +10,40 @@ static uint32_t whitetexture;
 
 int greet_id;
 
-char* greet_images[5] = {
+char* greet_images[9] = {
 	"nitro:/gfx/greethaato_blank.img.bin",
 	"nitro:/gfx/greethaato_nuance.img.bin",
 	"nitro:/gfx/greethaato_rno.img.bin",
 	"nitro:/gfx/greethaato_mercury.img.bin",
 	"nitro:/gfx/greethaato_k2.img.bin",
+	"nitro:/gfx/greethaato_ms.img.bin",
+	"nitro:/gfx/greethaato_sysk.img.bin",
+	"nitro:/gfx/greethaato_gt.img.bin",
+	"nitro:/gfx/greethaato_blank.img.bin",	
 };
+
+int fds[9];
+
+void preopen() {
+	for(int i = 0; i < 8; i++) {
+		fds[i] = open( greet_images[i], O_RDONLY );
+	}
+}
+
+void loadImageX(int id, uint16_t* buffer, uint32_t size) {
+	read( fds[id], buffer, size );
+	close( fds[id] );
+
+	// Ensure alpha bit is set
+	for( int i = 0; i < size/2; i++ ) {
+		buffer[i] |= BIT(15);
+	}
+}
 
 u16* greet_border_sprite[12];
 void effect2_init() {
+	preopen();
+	
 	DISPCNT_A = DISPCNT_MODE_5 | DISPCNT_BG2_ON | DISPCNT_BG3_ON | DISPCNT_OBJ_ON | DISPCNT_ON;
 	VRAMCNT_D = VRAMCNT_D_BG_VRAM_A_OFFS_128K;
 	VRAMCNT_B = VRAMCNT_B_BG_VRAM_A_OFFS_0K;
@@ -69,7 +93,9 @@ void effect2_init() {
 	greet_border_sprite[11] = loadBmpSpriteAGreen( "nitro:/gfx/greets_border_11.img.bin" );
 }
 
+int last_greet_loaded = 0;
 u8 effect2_update( u32 t ) {
+	t *= ((12.5*8.0)/60.0);
 	float scale = (((float)isin(t*16)+4096) / 256.0)+0.5f;
 	int dx=icos(t*64)>>4;
 	int dy=isin(t*64)>>4;
@@ -86,9 +112,13 @@ u8 effect2_update( u32 t ) {
 		);
 	}
 	
-	if(t%256 == 0) {
-		greet_id = (greet_id + 1)%5;
-		loadImage(greet_images[greet_id],VRAM_A_OFFS_0K,256*256*2);
+	if(t%256 < 4 && last_greet_loaded == 0) {
+		last_greet_loaded = 1;
+		greet_id = (greet_id + 1)%8;
+		loadImageX(greet_id,VRAM_A_OFFS_0K,256*256*2);
+	}
+	else {
+		last_greet_loaded = 0;
 	}
 	
 	dx *= scale;

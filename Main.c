@@ -128,10 +128,10 @@ int main()
 	blockload = 0;
 	
 	// Main loop
-// 	#define EFFECT_DEBUG
+	#define EFFECT_DEBUG
 	#ifdef EFFECT_DEBUG
 	effect0_init();
-	effect1_init();
+	effect2_init();
 // 	InitField();
 // 	InitHeartField();
 	metaballs_precompute();
@@ -162,12 +162,12 @@ int main()
 
 		#define DUR (64.0 * 2.0 * (4.8))
 
-// 		#define DUR (60*4)
+		#define DUR (60*4)
 		
 		#ifdef EFFECT_DEBUG
 // 		effect0_update(t-toff);
 // //  		RunHeartField(t);
-		effect1_update(t);
+		effect2_update(t);
 // 		RunField(t);
 // // 		metaballs_update(t);
 // 		if( t == 16*20+30 ) {
@@ -289,10 +289,11 @@ int main()
 				blockload = 1;
 				memset( master_bright, (1<<7) | 16, 2 );
 				StopField();
-				// TODO Outro init
+				effect7_init();
+				effect7_update(t);
 				blockload = 0;
 			}
-			// TODO run outro
+			effect7_update(t);
 			fadeinout(t-toff,12*DUR,14*DUR);
 		}
 		#endif

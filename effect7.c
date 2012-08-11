@@ -62,7 +62,7 @@ u8 effect7_update( u32 t ) {
 
 	for(int i=0;i<256;i++) {
 		int c=(hnext())&0x1f;
-			PALRAM_A[i]=(0x8000|(c<<10)|(c<<5)|c)^rainbowTable[rind++];
+			// PALRAM_A[i]=(0x8000|(c<<10)|(c<<5)|c)^rainbowTable[rind++];
 	}
 
 	return( 1 );

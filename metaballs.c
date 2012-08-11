@@ -46,7 +46,7 @@ PRECELL* pre_grid;
 TRIANGLE* triangles;
 
 // Get a single grid cell by looking up shit in the precalc'd table
-static inline void cell_at( GRIDCELL* b, s32 x, s32 y, s32 z, s32 cx, s32 cy, s32 cz, u8 inf ) {
+static inline void ATTR_ITCM cell_at( GRIDCELL* b, s32 x, s32 y, s32 z, s32 cx, s32 cy, s32 cz, u8 inf ) {
 	s16 accx;
 	s16 accy;
 	s16 accz;
@@ -181,9 +181,17 @@ void metaballs_precompute() {
 	copyTables();	
 }
 
+// Let's recurse but not!
+// s16 pc[400][3];
+s16 *pc = (s16*)(0x027C0000 + 256 * sizeof( s16 ) + 256*16*sizeof( s8 ));
+// s16* pc;
+#define PC(x,y) pc[(x)*3+(y)]
+
 // mah balls.
 void metaballs_init() {
 
+// 	pc = malloc(400*3*sizeof(s16));
+	
 	DISPCNT_A=DISPCNT_MODE_5|DISPCNT_3D|DISPCNT_BG0_ON|DISPCNT_BG3_ON|DISPCNT_ON;
 
 	BLDCNT_A = BLDCNT_SRC_A_BG3|BLDCNT_SRC_B_BG0|BLDCNT_EFFECT_ALPHA;
@@ -233,39 +241,33 @@ void metaballs_init() {
 s16 g_tris = 0;
 s8 mark_grid[30][30][30];
 
-// Let's recurse but not!
-// s16 pc[400][3];
-s16 *pc = (s8*)(0x027C0000 + 256 * sizeof( s16 ) + 256*16*sizeof( s8 ))
-
-#define PC(x,y) pc[400*x+y]
-
 s16 cp = 0;
 
 static inline void ATTR_ITCM step_to_pc( s32 x, s32 y, s32 z );
 static inline void ATTR_ITCM step_to_pc( s32 x, s32 y, s32 z ) {
-	pc[ cp + 1 ][ 0 ] = x + 1;
-	pc[ cp + 1 ][ 1 ] = y;
-	pc[ cp + 1 ][ 2 ] = z;
+	PC(cp + 1 , 0 ) = x + 1;
+	PC(cp + 1 , 1 ) = y;
+	PC(cp + 1 , 2 ) = z;
 	
-	pc[ cp + 2 ][ 0 ] = x - 1;
-	pc[ cp + 2 ][ 1 ] = y;
-	pc[ cp + 2 ][ 2 ] = z;
+	PC(cp + 2 , 0 ) = x - 1;
+	PC(cp + 2 , 1 ) = y;
+	PC(cp + 2 , 2 ) = z;
 	
-	pc[ cp + 3 ][ 0 ] = x;
-	pc[ cp + 3 ][ 1 ] = y + 1;
-	pc[ cp + 3 ][ 2 ] = z;
+	PC(cp + 3 , 0 ) = x;
+	PC(cp + 3 , 1 ) = y + 1;
+	PC(cp + 3 , 2 ) = z;
 	
-	pc[ cp + 4 ][ 0 ] = x;
-	pc[ cp + 4 ][ 1 ] = y - 1;
-	pc[ cp + 4 ][ 2 ] = z;
+	PC(cp + 4 , 0 ) = x;
+	PC(cp + 4 , 1 ) = y - 1;
+	PC(cp + 4 , 2 ) = z;
 
-	pc[ cp + 5 ][ 0 ] = x;
-	pc[ cp + 5 ][ 1 ] = y;
-	pc[ cp + 5 ][ 2 ] = z + 1;
+	PC(cp + 5 , 0 ) = x;
+	PC(cp + 5 , 1 ) = y;
+	PC(cp + 5 , 2 ) = z + 1;
 	
-	pc[ cp + 6 ][ 0 ] = x;
-	pc[ cp + 6 ][ 1 ] = y;
-	pc[ cp + 6 ][ 2 ] = z - 1;
+	PC(cp + 6 , 0 ) = x;
+	PC(cp + 6 , 1 ) = y;
+	PC(cp + 6 , 2 ) = z - 1;
 
 	cp += 7;
 }
@@ -308,31 +310,31 @@ static inline u32 ATTR_ITCM balls( s32* x, s32* y, s32* z, s8 ball_count, TRIANG
 
 		// Push first step.
 		cp = 0;
-		pc[ cp ][ 0 ] = cx;
-		pc[ cp ][ 1 ] = cy;
-		pc[ cp ][ 2 ] = cz;
-		step_to_pc( pc[ cp ][ 0 ], pc[ cp ][ 1 ], pc[ cp ][ 2 ] );
+		PC(cp,0) = cx;
+		PC(cp,1) = cy;
+		PC(cp,2) = cz;
+		step_to_pc( PC(cp,0), PC(cp,1), PC(cp,2) );
 
 		do {
 			// Pop one step.
 			cp--;
 			
 			// Visitation check.
-			if( mark_grid[pc[ cp ][ 0 ]][pc[ cp ][ 1 ]][pc[ cp ][ 2 ]] == 1 ) {
+			if( mark_grid[PC(cp, 0)][PC(cp, 1)][PC(cp, 2)] == 1 ) {
 				continue;
 			}
-			mark_grid[pc[ cp ][ 0 ]][pc[ cp ][ 1 ]][pc[ cp ][ 2 ]] = 1;
+			mark_grid[PC(cp, 0)][PC(cp, 1)][PC(cp, 2)] = 1;
 
 			// Tri check.
-			cell_at( &b, pc[cp][0], pc[cp][1], pc[cp][2], x[ 0 ], y[ 0 ], z[ 0 ], 0 );
+			cell_at( &b, PC(cp,0), PC(cp,1), PC(cp,2), x[ 0 ], y[ 0 ], z[ 0 ], 0 );
 			for( u8 i = 1; i < ball_count; i++ ) {
-				cell_add( &b, pc[cp][0], pc[cp][1], pc[cp][2], x[ i ], y[ i ], z[ i ], i );
+				cell_add( &b, PC(cp,0), PC(cp,1), PC(cp,2), x[ i ], y[ i ], z[ i ], i );
 			}
 			tri_add = polygonise( &b, 1 << 14, &tris[ g_tris ] );
 
 			if( tri_add != 0 ) {
 				g_tris += tri_add;
-				step_to_pc( pc[ cp ][ 0 ], pc[ cp ][ 1 ], pc[ cp ][ 2 ] );
+				step_to_pc( PC(cp, 0), PC(cp, 1), PC(cp, 2) );
 			}
 			
 		} while( cp != 0 );
@@ -396,4 +398,5 @@ void metaballs_destroy() {
 	BLDALPHA_A = 0;
 	free(triangles);
 	free(pre_grid);
+// 	free(pc);
 }

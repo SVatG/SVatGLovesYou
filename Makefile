@@ -21,8 +21,9 @@ OBJS = Main.o ARM.o \
        effect2.o \
        effect3.o \
        effect6.o \
-       effect4.o
-	
+       effect4.o \
+       effect7.o
+       
 OBJS7 = Main.arm7.o
 
 #DEVKITPRO=../devkit/devkitPro
@@ -69,6 +70,9 @@ BITMAPS = gfx/svatgst_indexed.bin \
 	  gfx/greethaato_k2.bin \
 	  gfx/greethaato_nuance.bin \
 	  gfx/greethaato_rno.bin \
+	  gfx/greethaato_ms.bin \
+	  gfx/greethaato_sysk.bin \
+	  gfx/greethaato_gt.bin \
 	  gfx/greets_border_00.bin \
 	  gfx/greets_border_01.bin \
 	  gfx/greets_border_02.bin \
