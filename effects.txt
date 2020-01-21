@@ -1,0 +1,8 @@
+Interference
+Metaballs
+Ribbons
+Tunnel
+The Following Groups (Also, Rotozooming)
+Voxels
+Recycling [EEG effect]
+Raymarching
