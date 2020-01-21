@@ -1,0 +1,6 @@
+*.o
+gfx/*.h
+*.bin
+svatglovesyou.*
+*~
+gfx_dev/*
